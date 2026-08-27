@@ -2,7 +2,6 @@
 <html lang="de">
 <head>
 <script src="js/consent.js"></script>
-
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <script src="js/theme.js"></script>
@@ -14,106 +13,73 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap"></noscript>
 <link rel="stylesheet" href="css/styles.css">
 <style>
-.turma-item{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
-  padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:14px;
-}
-.turma-item .nome{font-weight:600;font-size:0.98rem;}
-.turma-item .codigo{font-size:0.76rem;color:var(--ink-faint);margin-top:2px;}
-.btn-sair{
-  font-family:inherit;font-size:0.78rem;font-weight:600;
-  padding:7px 14px;border-radius:var(--r-sm);border:1px solid var(--line);
-  background:transparent;color:var(--ink-soft);cursor:pointer;
-}
+.turma-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:18px;}
+.turma-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px;}
+.turma-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;}
+.turma-code{font-size:.76rem;color:var(--ink-faint);margin-top:3px;}
+.btn-sair{font-family:inherit;font-size:.78rem;font-weight:600;padding:7px 14px;border-radius:var(--r-sm);border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;}
 .btn-sair:hover{border-color:var(--err);color:var(--err);}
+.aufgaben-title{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:700;margin:16px 0 10px;}
+.aufgabe-item{border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;margin-top:9px;background:var(--bg,var(--card));}
+.aufgabe-item .meta{font-size:.74rem;color:var(--ink-faint);margin-bottom:6px;}
+.aufgabe-item .text{font-size:.9rem;line-height:1.55;color:var(--ink);white-space:pre-wrap;}
+.aufgaben-empty{font-size:.82rem;color:var(--ink-faint);padding:8px 0;}
+.aufgaben-error{font-size:.82rem;color:var(--err);padding:8px 0;}
 </style>
 </head>
 <body>
 <div class="wrap" role="main">
   <div class="masthead">
-    <a class="brand" href="/">
-      <img src="assets/mark.png" alt="Sprachio" width="53" height="60">
-      <span><span class="name">SPRACHIO</span></span>
-    </a>
-    <div class="header-actions">
-      <span id="userEmail" style="font-size:0.8rem;color:var(--ink-faint);"></span>
-      <a class="home-link" href="/trainer-hub">← Hub</a>
-    </div>
+    <a class="brand" href="/"><img src="assets/mark.png" alt="Sprachio" width="53" height="60"><span><span class="name">SPRACHIO</span></span></a>
+    <div class="header-actions"><span id="userEmail" style="font-size:.8rem;color:var(--ink-faint);"></span><a class="home-link" href="/trainer-hub">← Hub</a></div>
   </div>
-
   <h2 class="screen-title" style="margin-bottom:6px;">Meine Klassen</h2>
-  <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 24px;">Klassen, denen du über einen Code beigetreten bist.</p>
-
+  <p style="color:var(--ink-soft);font-size:.92rem;margin:0 0 24px;">Klassen, denen du über einen Code beigetreten bist.</p>
   <div id="listaTurmas"><div class="hist-loading">Laden&hellip;</div></div>
 </div>
-
 <script src="js/config.js"></script>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-const SUPABASE_URL = window.SCHREIBTRAINER_CONFIG?.SUPABASE_URL || "";
-const SUPABASE_KEY = window.SCHREIBTRAINER_CONFIG?.SUPABASE_ANON_KEY || "";
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const { data: { session } } = await supabase.auth.getSession();
-if (!session) { location.href = '/login'; }
-
-const $ = id => document.getElementById(id);
-function escapeHtml(str){ const d=document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
-const userEl = $('userEmail');
-if (userEl && session) userEl.textContent = session.user.email;
-
-function sbFetch(path, options={}){
-  const headers=Object.assign({
-    'apikey': SUPABASE_KEY,
-    'Authorization': 'Bearer ' + session.access_token,
-    'Content-Type':'application/json'
-  }, options.headers||{});
-  return fetch(`${SUPABASE_URL}/rest/v1/${path}`, Object.assign({}, options, { headers }));
+const SUPABASE_URL=window.SCHREIBTRAINER_CONFIG?.SUPABASE_URL||'';
+const SUPABASE_KEY=window.SCHREIBTRAINER_CONFIG?.SUPABASE_ANON_KEY||'';
+const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
+const {data:{session}}=await supabase.auth.getSession();
+if(!session){location.href='/login';}
+const $=id=>document.getElementById(id);
+function escapeHtml(str){const d=document.createElement('div');d.textContent=str??'';return d.innerHTML;}
+$('userEmail').textContent=session.user.email;
+function sbFetch(path,options={}){const headers=Object.assign({'apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'},options.headers||{});return fetch(`${SUPABASE_URL}/rest/v1/${path}`,Object.assign({},options,{headers}));}
+async function carregarAufgaben(turmaId){
+  try{
+    const res=await sbFetch(`aufgabas_turma?turma_id=eq.${encodeURIComponent(turmaId)}&select=id,turma_id,niveau,aufgabenstellung,created_at&order=created_at.desc`);
+    if(!res.ok){const body=await res.text();throw new Error(`HTTP ${res.status}: ${body}`);}
+    const aufgaben=await res.json();
+    if(!Array.isArray(aufgaben)||!aufgaben.length)return '<div class="aufgaben-empty">Noch keine Aufgaben für diese Klasse.</div>';
+    return aufgaben.map(a=>`<div class="aufgabe-item"><div class="meta">${escapeHtml(a.niveau||'')} · ${a.created_at?new Date(a.created_at).toLocaleDateString('de-DE'):''}</div><div class="text">${escapeHtml(a.aufgabenstellung)}</div></div>`).join('');
+  }catch(e){console.error('Fehler beim Laden der Aufgaben:',e);return '<div class="aufgaben-error">Aufgaben konnten nicht geladen werden.</div>';}
 }
-
 async function carregar(){
-  const el = $('listaTurmas');
-  try {
-    const resM = await sbFetch(`turma_membros?user_id=eq.${session.user.id}&select=turma_id`);
-    const membros = await resM.json();
-    if (!Array.isArray(membros) || !membros.length) {
-      el.innerHTML = `<div class="ms-empty">Du bist noch keiner Klasse beigetreten. Frag deine Lehrkraft nach dem Beitrittscode.</div>`;
-      return;
-    }
-    const ids = membros.map(m => `"${m.turma_id}"`).join(',');
-    const resT = await sbFetch(`turmas?id=in.(${ids})&select=id,nome,codigo`);
-    const turmas = await resT.json();
-
-    el.innerHTML = (turmas || []).map(t => `
-      <div class="turma-item" data-id="${t.id}">
-        <div>
-          <div class="nome">${escapeHtml(t.nome)}</div>
-          <div class="codigo">Code: ${escapeHtml(t.codigo)}</div>
-        </div>
-        <button class="btn-sair" data-id="${t.id}">Verlassen</button>
-      </div>`).join('');
-
-    el.querySelectorAll('.btn-sair').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (!confirm('Diese Klasse wirklich verlassen?')) return;
-        await sbFetch(`turma_membros?turma_id=eq.${btn.dataset.id}&user_id=eq.${session.user.id}`, { method: 'DELETE' });
-        carregar();
-      });
-    });
-  } catch(e) {
-    el.innerHTML = `<div class="ms-empty">Fehler beim Laden.</div>`;
-  }
+ const el=$('listaTurmas');
+ try{
+  const resM=await sbFetch(`turma_membros?user_id=eq.${encodeURIComponent(session.user.id)}&select=turma_id`);
+  if(!resM.ok)throw new Error(`turma_membros HTTP ${resM.status}: ${await resM.text()}`);
+  const membros=await resM.json();
+  if(!Array.isArray(membros)||!membros.length){el.innerHTML='<div class="ms-empty">Du bist noch keiner Klasse beigetreten. Frag deine Lehrkraft nach dem Beitrittscode.</div>';return;}
+  const ids=membros.map(m=>`"${m.turma_id}"`).join(',');
+  const resT=await sbFetch(`turmas?id=in.(${ids})&select=id,nome,codigo`);
+  if(!resT.ok)throw new Error(`turmas HTTP ${resT.status}: ${await resT.text()}`);
+  const turmas=await resT.json();
+  if(!Array.isArray(turmas)||!turmas.length){el.innerHTML='<div class="ms-empty">Keine Klassen gefunden.</div>';return;}
+  el.innerHTML=turmas.map(t=>`<div class="turma-card" data-id="${escapeHtml(t.id)}"><div class="turma-head"><div><div class="turma-name">${escapeHtml(t.nome)}</div><div class="turma-code">Code: ${escapeHtml(t.codigo)}</div></div><button class="btn-sair" data-id="${escapeHtml(t.id)}">Verlassen</button></div><div class="aufgaben-title">📚 Aufgaben</div><div class="aufgaben-list" data-aufgaben-for="${escapeHtml(t.id)}"><div class="hist-loading">Laden&hellip;</div></div></div>`).join('');
+  await Promise.all(turmas.map(async t=>{const target=el.querySelector(`[data-aufgaben-for="${CSS.escape(String(t.id))}"]`);if(target)target.innerHTML=await carregarAufgaben(t.id);}));
+  el.querySelectorAll('.btn-sair').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('Diese Klasse wirklich verlassen?'))return;const res=await sbFetch(`turma_membros?turma_id=eq.${encodeURIComponent(btn.dataset.id)}&user_id=eq.${encodeURIComponent(session.user.id)}`,{method:'DELETE'});if(!res.ok){alert('Klasse konnte nicht verlassen werden.');return;}carregar();}));
+ }catch(e){console.error('Fehler beim Laden der Klassen:',e);el.innerHTML='<div class="ms-empty">Fehler beim Laden. Bitte versuche es erneut.</div>';}
 }
 carregar();
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js').catch(()=>{}));
-}
-</script>
+<script>if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js').catch(()=>{}));}</script>
 </body>
 </html>
