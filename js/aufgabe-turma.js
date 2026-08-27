@@ -1,7 +1,8 @@
 /* Sprachio — carrega uma Aufgabe da turma e entrega ao fluxo normal do Trainer */
 (function(){
   const params = new URLSearchParams(location.search);
-  const taskId = params.get('aufgabe_id');
+  // Aceita os dois formatos para manter compatibilidade com links antigos.
+  const taskId = params.get('aufgabe_id') || params.get('id');
   if (!taskId) return;
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -51,7 +52,9 @@
         classroom: true
       },
       texto: '',
-      segundos_restantes: null,
+      // rascunhos.segundos_restantes é NOT NULL. 0 significa que o Trainer
+      // deve iniciar um cronômetro novo, em vez de tentar restaurar um valor.
+      segundos_restantes: 0,
       atualizado_em: new Date().toISOString()
     };
   }
@@ -60,8 +63,6 @@
     try {
       if (!await setup()) return;
 
-      // A mesma consulta usada na lista de turmas: se ela funciona lá,
-      // a Aufgabe também pode ser carregada aqui.
       const res = await rest(`aufgabas_turma?id=eq.${encodeURIComponent(taskId)}&select=id,turma_id,niveau,aufgabenstellung,created_at&limit=1`);
       const raw = await res.text();
       if (!res.ok) throw new Error(`Aufgabe HTTP ${res.status}: ${raw}`);
@@ -69,9 +70,8 @@
       task = Array.isArray(rows) ? rows[0] : null;
       if (!task) throw new Error('Aufgabe nicht gefunden.');
 
-      // Wichtig: rascunhos tem user_id como PRIMARY KEY. Upsert evita a
-      // corrida entre este script e a inicialização do Trainer e elimina
-      // o antigo DELETE + INSERT que causava falhas intermitentes.
+      // rascunhos tem user_id como PRIMARY KEY. Upsert atualiza o rascunho
+      // do aluno sem criar uma segunda linha.
       const draft = await rest('rascunhos', {
         method: 'POST',
         headers: {
@@ -84,8 +84,7 @@
         throw new Error(`Rascunho HTTP ${draft.status}: ${detail}`);
       }
 
-      // app.js carrega o rascunho durante sua inicialização. Esperamos o
-      // botão aparecer e usamos a própria rotina oficial do Trainer.
+      // app.js carrega o rascunho durante sua inicialização.
       for (let i = 0; i < 150; i++) {
         const btn = document.getElementById('btnFortsetzenRascunho');
         if (btn) {
@@ -99,7 +98,6 @@
     } catch (e) {
       console.error('[Sprachio Aufgabe]', e);
       const message = e && e.message ? e.message : String(e);
-      // Mostra a causa no console e uma mensagem amigável na interface.
       const box = document.getElementById('feedback') || document.body;
       if (box && box.id === 'feedback') {
         const el = document.getElementById('fbErfuellung');
@@ -110,8 +108,6 @@
     }
   }
 
-  // O script é carregado depois de app.js. Aguardar o DOM permite que o
-  // Trainer termine sua inicialização antes de retomar o rascunho.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', main);
   } else {
