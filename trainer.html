@@ -2,7 +2,6 @@
 <html lang="de">
 <head>
 <script src="js/consent.js"></script>
-
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <script src="js/theme.js"></script>
@@ -15,150 +14,27 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap"></noscript>
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <div class="wrap" role="main">
-
-  <div class="masthead">
-    <a class="brand" href="/">
-      <img src="assets/mark.png" alt="Sprachio" width="53" height="60">
-      <span>
-        <span class="name">SPRACHIO</span>
-      </span>
-    </a>
-    <div class="header-actions">
-      <span id="userEmail" style="font-size:0.8rem;color:var(--ink-faint);"></span>
-      <a class="home-link" href="/trainer-hub">← Hub</a>
-    </div>
-  </div>
-
-  <div class="stepper" id="stepper"></div>
-
-  <!-- PAGE 2: Konfiguration -->
-  <section class="page" id="page-config">
-
-    <div id="rascunhoNuvemBox" style="display:none;margin-bottom:20px;"></div>
-
-    <div class="modus-tabs" style="margin-bottom:20px;">
-      <button class="modus-tab active" data-modus="neu">Neues Thema generieren</button>
-      <button class="modus-tab" data-modus="real">Echter Modellsatz üben</button>
-    </div>
-
-    <div id="blocoNeu">
-      <h2 class="screen-title" style="margin-bottom:14px;">Niveau, Textsorte &amp; Schwierigkeit</h2>
-      <div class="niveau-row" id="niveauRow"></div>
-      <div class="teile" id="teileRow"></div>
-      <div class="diff-block">
-        <div class="diff-head">
-          <span class="label">Schwierigkeitsgrad</span>
-          <span class="val" id="diffVal">4</span>
-        </div>
-        <input type="range" min="1" max="8" value="4" id="diffSlider">
-        <div class="diff-scale"><span>1 · leicht</span><span>8 · anspruchsvoll</span></div>
-        <div class="diff-hint">Steuert, wie anspruchsvoll Wortschatz, Thema und Aufgabenstellung innerhalb des gewählten Niveaus sind.</div>
-      </div>
-      <div class="nav-row">
-        <span></span>
-        <button class="primary" id="btnToAufgabe">Weiter →</button>
-      </div>
-    </div>
-
-    <div id="blocoReal" style="display:none;">
-      <h2 class="screen-title" style="margin-bottom:6px;">Modellsatz wählen</h2>
-      <p style="font-size:0.9rem;color:var(--ink-soft);margin:0 0 16px;">Wähle ein Niveau und dann einen echten DSD-Modellsatz als Übungsaufgabe.</p>
-      <div class="niveau-row" id="niveauRowReal"></div>
-      <div class="ms-picker-grid" id="msPickerGrid"></div>
-      <div class="nav-row">
-        <span></span>
-        <button class="primary" id="btnToSchreibenReal" disabled>Mit dieser Aufgabe schreiben →</button>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- PAGE 3: Aufgabe -->
-  <section class="page" id="page-aufgabe">
-    <h2 class="screen-title">Aufgabe</h2>
-    <div class="aufgabe-card">
-      <div class="label"><span id="aufgabeTag"></span><span id="aufgabeSchwierigkeit"></span></div>
-      <div class="aufgabe-text" id="aufgabeText">—</div>
-      <div class="quelltext" id="quelltext" style="display:none;"></div>
-      <div class="baloes" id="baloes" style="display:none;"></div>
-      <div class="ref-note" id="refNote"></div>
-      <div class="card-actions" id="cardActionsAufgabe">
-        <button class="primary" id="btnGerarIA">Neues Thema generieren</button>
-        <span class="loading-inline" id="loadingIA" style="display:none;">wird erstellt&hellip;</span>
-      </div>
-    </div>
-    <div class="nav-row">
-      <button class="ghost" id="btnBackToConfig">← Zurück</button>
-      <button class="primary" id="btnToSchreiben" disabled>Weiter →</button>
-    </div>
-  </section>
-
-  <!-- PAGE 4: Schreiben -->
-  <section class="page" id="page-schreiben">
-    <div class="schreiben-header">
-      <h2 class="screen-title">Dein Text</h2>
-      <div id="cronometro" class="cronometro">--:--</div>
-    </div>
-
-    <!-- Aufgabe fica sempre visível — pode ser recolhida pelo aluno -->
-    <div class="aufgabe-inline" id="aufgabeInline">
-      <div class="aufgabe-inline-head">
-        <span id="aufgabeInlineTag"></span>
-        <button class="ghost" id="btnToggleAufgabe" style="font-size:0.74rem;padding:6px 12px;">Ausblenden</button>
-      </div>
-      <div class="aufgabe-inline-body" id="aufgabeInlineBody">
-        <div class="baloes" id="baloesInline" style="display:none;"></div>
-        <div class="aufgabe-text" id="aufgabeInlineText"></div>
-      </div>
-    </div>
-
-    <div class="schreibfeld-wrap">
-      <div class="schreibfeld-head">
-        <span class="label">Text</span>
-        <span class="wortzahl" id="wortzahlEl">0 Wörter</span>
-      </div>
-      <textarea id="textInput" placeholder="Schreib hier deinen Text auf Deutsch..."></textarea>
-    </div>
-    <div class="nav-row">
-      <button class="ghost" id="btnBackToAufgabe">← Zurück</button>
-      <button class="primary" id="btnSenden">Senden &amp; korrigieren →</button>
-    </div>
-  </section>
-
-  <!-- PAGE 5: Korrektur -->
-  <section class="page" id="page-korrektur">
-    <h2 class="screen-title">Korrektur</h2>
-    <div class="loading-big" id="loadingResult"><div class="spin"></div>Text wird analysiert&hellip;</div>
-    <div class="feedback" id="feedback" style="display:none;">
-      <div class="stamp" id="stamp"><div class="niveau" id="stampNiveau">B1</div><div class="tag" id="stampTag">erreicht</div></div>
-      <div class="fb-section"><h3>Schritt 2 · Bewertung nach DSD-I-Kriterien</h3><div id="fbErfuellung"></div></div>
-      <div class="fb-section"><h3>Niveaueinschätzung</h3><p id="fbAufbau"></p></div>
-      <div class="fb-section"><h3>Schritt 4 · Sprachliche Analyse</h3><div id="fbSprache"></div></div>
-      <div class="fb-section"><h3>Schritt 5 · Schülerfeedback</h3><ul class="korrekturen" id="korrekturenList"></ul></div>
-      <div class="tip-box" id="fbTip"></div>
-      <button class="ghost" id="btnMusterloesung" style="margin-top:16px;">📄 Musterlösung anzeigen</button>
-      <div id="musterloesungResult"></div>
-    </div>
-    <div class="nav-row">
-      <button class="ghost" id="btnNeueTextsorte">Neue Textsorte</button>
-      <button class="primary" id="btnNochmal">Nochmal schreiben (gleiche Aufgabe)</button>
-    </div>
-  </section>
-
-  <div class="disclaimer">Übungswerkzeug &mdash; keine offizielle Prüfungsbewertung. Themen werden von einer KI generiert, orientiert an echten Modellsätzen.</div>
+<div class="masthead"><a class="brand" href="/"><img src="assets/mark.png" alt="Sprachio" width="53" height="60"><span><span class="name">SPRACHIO</span></span></a><div class="header-actions"><span id="userEmail" style="font-size:0.8rem;color:var(--ink-faint);"></span><a class="home-link" href="/trainer-hub">← Hub</a></div></div>
+<div class="stepper" id="stepper"></div>
+<section class="page" id="page-config">
+<div id="rascunhoNuvemBox" style="display:none;margin-bottom:20px;"></div>
+<div class="modus-tabs" style="margin-bottom:20px;"><button class="modus-tab active" data-modus="neu">Neues Thema generieren</button><button class="modus-tab" data-modus="real">Echter Modellsatz üben</button></div>
+<div id="blocoNeu"><h2 class="screen-title" style="margin-bottom:14px;">Niveau, Textsorte &amp; Schwierigkeit</h2><div class="niveau-row" id="niveauRow"></div><div class="teile" id="teileRow"></div><div class="diff-block"><div class="diff-head"><span class="label">Schwierigkeitsgrad</span><span class="val" id="diffVal">4</span></div><input type="range" min="1" max="8" value="4" id="diffSlider"><div class="diff-scale"><span>1 · leicht</span><span>8 · anspruchsvoll</span></div><div class="diff-hint">Steuert, wie anspruchsvoll Wortschatz, Thema und Aufgabenstellung innerhalb des gewählten Niveaus sind.</div></div><div class="nav-row"><span></span><button class="primary" id="btnToAufgabe">Weiter →</button></div></div>
+<div id="blocoReal" style="display:none;"><h2 class="screen-title" style="margin-bottom:6px;">Modellsatz wählen</h2><p style="font-size:0.9rem;color:var(--ink-soft);margin:0 0 16px;">Wähle ein Niveau und dann einen echten DSD-Modellsatz als Übungsaufgabe.</p><div class="niveau-row" id="niveauRowReal"></div><div class="ms-picker-grid" id="msPickerGrid"></div><div class="nav-row"><span></span><button class="primary" id="btnToSchreibenReal" disabled>Mit dieser Aufgabe schreiben →</button></div></div>
+</section>
+<section class="page" id="page-aufgabe"><h2 class="screen-title">Aufgabe</h2><div class="aufgabe-card"><div class="label"><span id="aufgabeTag"></span><span id="aufgabeSchwierigkeit"></span></div><div class="aufgabe-text" id="aufgabeText">—</div><div class="quelltext" id="quelltext" style="display:none;"></div><div class="baloes" id="baloes" style="display:none;"></div><div class="ref-note" id="refNote"></div><div class="card-actions" id="cardActionsAufgabe"><button class="primary" id="btnGerarIA">Neues Thema generieren</button><span class="loading-inline" id="loadingIA" style="display:none;">wird erstellt&hellip;</span></div></div><div class="nav-row"><button class="ghost" id="btnBackToConfig">← Zurück</button><button class="primary" id="btnToSchreiben" disabled>Weiter →</button></div></section>
+<section class="page" id="page-schreiben"><div class="schreiben-header"><h2 class="screen-title">Dein Text</h2><div id="cronometro" class="cronometro">--:--</div></div><div class="aufgabe-inline" id="aufgabeInline"><div class="aufgabe-inline-head"><span id="aufgabeInlineTag"></span><button class="ghost" id="btnToggleAufgabe" style="font-size:0.74rem;padding:6px 12px;">Ausblenden</button></div><div class="aufgabe-inline-body" id="aufgabeInlineBody"><div class="baloes" id="baloesInline" style="display:none;"></div><div class="aufgabe-text" id="aufgabeInlineText"></div></div></div><div class="schreibfeld-wrap"><div class="schreibfeld-head"><span class="label">Text</span><span class="wortzahl" id="wortzahlEl">0 Wörter</span></div><textarea id="textInput" placeholder="Schreib hier deinen Text auf Deutsch..."></textarea></div><div class="nav-row"><button class="ghost" id="btnBackToAufgabe">← Zurück</button><button class="primary" id="btnSenden">Senden &amp; korrigieren →</button></div></section>
+<section class="page" id="page-korrektur"><h2 class="screen-title">Korrektur</h2><div class="loading-big" id="loadingResult"><div class="spin"></div>Text wird analysiert&hellip;</div><div class="feedback" id="feedback" style="display:none;"><div class="stamp" id="stamp"><div class="niveau" id="stampNiveau">B1</div><div class="tag" id="stampTag">erreicht</div></div><div class="fb-section"><h3>Schritt 2 · Bewertung nach DSD-I-Kriterien</h3><div id="fbErfuellung"></div></div><div class="fb-section"><h3>Niveaueinschätzung</h3><p id="fbAufbau"></p></div><div class="fb-section"><h3>Schritt 4 · Sprachliche Analyse</h3><div id="fbSprache"></div></div><div class="fb-section"><h3>Schritt 5 · Schülerfeedback</h3><ul class="korrekturen" id="korrekturenList"></ul></div><div class="tip-box" id="fbTip"></div><button class="ghost" id="btnMusterloesung" style="margin-top:16px;">📄 Musterlösung anzeigen</button><div id="musterloesungResult"></div></div><div class="nav-row"><button class="ghost" id="btnNeueTextsorte">Neue Textsorte</button><button class="primary" id="btnNochmal">Nochmal schreiben (gleiche Aufgabe)</button></div></section>
+<div class="disclaimer">Übungswerkzeug &mdash; keine offizielle Prüfungsbewertung. Themen werden von einer KI generiert, orientiert an echten Modellsätzen.</div>
 </div>
-
 <script src="js/config.js"></script>
 <script src="js/app.js"></script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js').catch(()=>{}));
-}
-</script>
+<script src="js/aufgabe-turma.js"></script>
+<script>if ('serviceWorker' in navigator) {window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js').catch(()=>{}));}</script>
 </body>
 </html>
