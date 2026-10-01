@@ -299,7 +299,7 @@ async function abrirTurma(turmaId){
       </div>`).join('');
 
     alunosEl.querySelectorAll('[data-verlauf]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const uid = btn.dataset.verlauf;
         const wrap = $('verlauf-' + uid);
         const abrindo = wrap.style.display === 'none';
