@@ -22,7 +22,7 @@ const TEXTSORTEN = {
 /* Cada nível agora é o seu próprio grupo — sem mistura entre IVA 2 / DSD I / DSD II */
 const NIVEAU_GROUP = { A2:'A2', B1:'B1', C1:'C1' };
 
-const state = { page:'config', maxPage:0, niveau:'B1', tipoKey:TEXTSORTEN['B1'][0].key, schwierigkeit:4, aufgabaObj:null, bank:[] };
+const state = { page:'config', maxPage:0, niveau:'B1', tipoKey:TEXTSORTEN['B1'][0].key, schwierigkeit:4, aufgabaObj:null, bank:[], classroomSubmission:false };
 const $ = id => document.getElementById(id);
 function currentMeta(){ return TEXTSORTEN[state.niveau].find(t => t.key === state.tipoKey); }
 function niveauLabel(n){ return NIVEAU_LABELS[n] || n; }
@@ -801,6 +801,7 @@ function retomarRascunhoNuvem(rascunho){
   state.tipoKey = rascunho.tipo_key;
   state.schwierigkeit = rascunho.schwierigkeit || 4;
   state.aufgabaObj = rascunho.aufgaba_obj;
+  state.classroomSubmission = !!rascunho.aufgaba_obj?.classroom;
 
   renderNiveauRow();
   renderTeileRow();
@@ -830,16 +831,61 @@ if ($('textInput')) $('textInput').addEventListener('input', () => {
   draftSaveTimer = setTimeout(salvarRascunho, 800);
 });
 if ($('btnBackToAufgabe')) $('btnBackToAufgabe').addEventListener('click', () => { pararSalvamentoNuvemPeriodico(); goToPage('aufgabe'); });
+async function enviarEntregaTurma(text) {
+  if (!_session?.user?.id || !state.aufgabaObj?.aufgabe_id || !state.aufgabaObj?.turma_id) {
+    throw new Error('Aufgabe der Klasse konnte nicht identifiziert werden.');
+  }
+
+  const res = await sbFetch('entregas_turma', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({
+      tarefa_id: state.aufgabaObj.aufgabe_id,
+      turma_id: state.aufgabaObj.turma_id,
+      aluno_id: _session.user.id,
+      aluno_email: _session.user.email || null,
+      texto: text,
+      status: 'enviada'
+    })
+  });
+  if (!res.ok) {
+    const detalhe = await res.text().catch(() => '');
+    throw new Error('Entrega HTTP ' + res.status + ': ' + detalhe);
+  }
+}
+
+function mostrarEntregaEnviada() {
+  $('loadingResult').style.display = 'none';
+  $('feedback').style.display = 'none';
+  const aviso = $('entregaEnviada');
+  if (aviso) aviso.style.display = 'block';
+}
+
 if ($('btnSenden')) $('btnSenden').addEventListener('click', async () => {
   const text = $('textInput').value.trim();
   if (!text) return;
   pararCronometro();
   limparRascunho();
   pararSalvamentoNuvemPeriodico();
-  apagarRascunhoNuvem();
+  await apagarRascunhoNuvem();
   state._textoEnviado = text;
   state.maxPage = Math.max(state.maxPage, 3);
   goToPage('korrektur');
+
+  if (state.classroomSubmission) {
+    $('loadingResult').style.display = 'block';
+    $('loadingResult').querySelector('.spin')?.remove();
+    $('loadingResult').innerHTML = '<div style="font-size:1.2rem;margin-bottom:8px;">✓</div><strong>Wird an die Lehrkraft gesendet…</strong>';
+    try {
+      await enviarEntregaTurma(text);
+      mostrarEntregaEnviada();
+    } catch (e) {
+      console.error(e);
+      $('loadingResult').innerHTML = '<div style="color:var(--err);">Die Abgabe konnte nicht gesendet werden. Bitte versuche es erneut.</div>';
+    }
+    return;
+  }
+
   $('loadingResult').style.display = 'block';
   $('feedback').style.display = 'none';
   await runKorrektur(text);
