@@ -244,7 +244,10 @@ async function abrirTurma(turmaId){
     const melhor = registros.reduce((best, r) => niveauParaNum(r.nivel_atingido) > niveauParaNum(best) ? r.nivel_atingido : best, '');
     const ultima = registros[0]?.created_at ? new Date(registros[0].created_at).toLocaleDateString('de-DE') : '—';
     const perfil = perfis.find(p => p.user_id === m.user_id);
-    return { user_id: m.user_id, nome: perfil?.nome || 'Schüler', count: registros.length, melhor: melhor || '—', ultima };
+    const entregasAluno = Array.isArray(entregasTurma) ? entregasTurma.filter(e => e.aluno_id === m.user_id) : [];
+    const ultimaEntrega = entregasAluno[0]?.enviado_em ? new Date(entregasAluno[0].enviado_em) : null;
+    const ultimaData = ultimaEntrega || (registros[0]?.created_at ? new Date(registros[0].created_at) : null);
+    return { user_id: m.user_id, nome: perfil?.nome || 'Schüler', count: entregasAluno.length, historicoCount: registros.length, ultima: ultimaData ? ultimaData.toLocaleDateString('de-DE') : '—' };
   });
 
   $('app').innerHTML = `
@@ -284,7 +287,7 @@ async function abrirTurma(turmaId){
         <div class="aluno-row">
           <div>
             <div class="email">${escapeHtml(a.nome)}</div>
-            <div class="stats">${a.count} Übungen · letzte: ${a.ultima}</div>
+            <div class="stats">${a.count} abgegebene Aufgaben · letzte: ${a.ultima}${a.historicoCount ? ` · ${a.historicoCount} freie Übungen` : ''}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <span class="badge">${escapeHtml(a.melhor)}</span>
@@ -303,20 +306,26 @@ async function abrirTurma(turmaId){
         wrap.style.display = abrindo ? 'block' : 'none';
         if (abrindo && !wrap.dataset.loaded) {
           const registros = historicoTodos.filter(h => h.user_id === uid);
+          const entregasAluno = Array.isArray(entregasTurma) ? entregasTurma.filter(e => e.aluno_id === uid) : [];
+          const aufgabenMap = new Map((Array.isArray(aufgabenTurma) ? aufgabenTurma : []).map(a => [a.id, a]));
           wrap.dataset.loaded = '1';
-          wrap.innerHTML = registros.length
-            ? registros.map(r => `
-                <div class="hist-card" style="margin-bottom:8px;">
-                  <div class="hist-top">
-                    <span class="hist-thema">${escapeHtml(r.thema || '—')}</span>
-                    <span class="hist-badge">${escapeHtml(r.nivel_atingido||'—')} · ${escapeHtml(r.status||'—')}</span>
-                  </div>
-                  <div class="hist-meta">${niveauLabel(r.niveau)} · ${escapeHtml(r.textsorte||'')} · ${new Date(r.created_at).toLocaleDateString('de-DE')}</div>
-                  ${r.texto_aluno ? `<div class="quelltext" style="margin-top:8px;">${escapeHtml(r.texto_aluno)}</div>` : ''}
-                  ${r.tipp ? `<div class="hist-tipp">→ ${escapeHtml(r.tipp)}</div>` : ''}
-                </div>`).join('')
-            : `<div class="ms-empty">Keine Einträge.</div>`;
-        }
+          const entregasHtml = entregasAluno.map(e => {
+            const aufgabe = aufgabenMap.get(e.tarefa_id);
+            const statusLabel = { enviada:'Abgegeben · wartet auf Korrektur', em_correcao_ia:'KI korrigiert…', corrigida_ia:'Mit KI korrigiert', corrigida_professora:'Von Lehrkraft korrigiert', recusada:'Nicht korrigiert' }[e.status] || e.status;
+            return `<div class="hist-card" style="margin-bottom:8px;">
+              <div class="hist-top"><span class="hist-thema">${escapeHtml(aufgabe?.aufgabenstellung || 'Aufgabe')}</span><span class="hist-badge">${escapeHtml(statusLabel)}</span></div>
+              <div class="hist-meta">${aufgabe?.niveau ? niveauLabel(aufgabe.niveau) + ' · ' : ''}${e.enviado_em ? new Date(e.enviado_em).toLocaleDateString('de-DE') : ''}</div>
+              <div class="quelltext" style="margin-top:8px;white-space:pre-wrap;">${escapeHtml(e.texto || '')}</div>
+            </div>`;
+          }).join('');
+          const historicoHtml = registros.map(r => `
+            <div class="hist-card" style="margin-bottom:8px;">
+              <div class="hist-top"><span class="hist-thema">${escapeHtml(r.thema || '—')}</span><span class="hist-badge">${escapeHtml(r.nivel_atingido||'—')} · ${escapeHtml(r.status||'—')}</span></div>
+              <div class="hist-meta">${niveauLabel(r.niveau)} · ${escapeHtml(r.textsorte||'')} · ${new Date(r.created_at).toLocaleDateString('de-DE')}</div>
+              ${r.texto_aluno ? `<div class="quelltext" style="margin-top:8px;">${escapeHtml(r.texto_aluno)}</div>` : ''}
+              ${r.tipp ? `<div class="hist-tipp">→ ${escapeHtml(r.tipp)}</div>` : ''}
+            </div>`).join('');
+          wrap.innerHTML = `<div style="font-size:0.76rem;font-weight:700;color:var(--ink-faint);margin:8px 0;">Abgegebene Klassenaufgaben</div>${entregasHtml || '<div class="ms-empty">Keine Klassenaufgaben abgegeben.</div>'}<div style="font-size:0.76rem;font-weight:700;color:var(--ink-faint);margin:14px 0 8px;">Freie Übungen</div>${historicoHtml || '<div class="ms-empty">Keine freien Übungen.</div>'}`;        }
       });
     });
 
