@@ -1347,6 +1347,75 @@ if ($('btnNochmal')) $('btnNochmal').addEventListener('click', () => {
   if (!location.hash) location.hash = '#/config';
   onHashChange();
 
+  // Klassenaufgabe direkt aus der URL laden. app.js wird vor
+  // aufgabe-turma.js eingebunden, deshalb darf der Classroom-Flow
+  // nicht davon abhängen, dass aufgabe-turma.js zuerst localStorage setzt.
+  let classroomDraft = null;
+  try {
+    const params = new URLSearchParams(location.search);
+    const taskId = params.get('aufgabe_id') || params.get('id');
+    if (taskId) {
+      const resTask = await sbFetch(
+        `aufgabas_turma?id=eq.${encodeURIComponent(taskId)}&select=id,turma_id,niveau,aufgabenstellung,created_at&limit=1`
+      );
+      if (resTask.ok) {
+        const rowsTask = await resTask.json();
+        const task = Array.isArray(rowsTask) ? rowsTask[0] : null;
+        if (task) {
+          classroomDraft = {
+            user_id: _session.user.id,
+            niveau: task.niveau,
+            tipo_key: task.niveau === 'A2' ? 'email_informell' : task.niveau === 'C1' ? 'erörterung_grafik' : 'leserbrief',
+            schwierigkeit: 4,
+            aufgaba_obj: {
+              aufgabe: task.aufgabenstellung || '',
+              quelltext: '',
+              thema: (task.aufgabenstellung || '').split(/\\n+/)[0].slice(0,120),
+              aufgabe_id: task.id,
+              turma_id: task.turma_id,
+              classroom: true
+            },
+            texto: '',
+            segundos_restantes: 0,
+            atualizado_em: new Date().toISOString()
+          };
+        }
+      }
+    }
+  } catch(e) {
+    console.warn('[Klassenaufgabe] URL-Aufgabe konnte nicht geladen werden:', e);
+  }
+
+  // Fallback para o fluxo antigo via localStorage.
+  if (!classroomDraft) try {
+    const raw = localStorage.getItem('sprachio_classroom_assignment');
+    if (raw) {
+      const task = JSON.parse(raw);
+      if (task?.aufgabe_id && task?.turma_id) {
+        classroomDraft = {
+          user_id: _session.user.id,
+          niveau: task.niveau,
+          tipo_key: task.niveau === 'A2' ? 'email_informell' : task.niveau === 'C1' ? 'erörterung_grafik' : 'leserbrief',
+          schwierigkeit: 4,
+          aufgaba_obj: {
+            aufgabe: task.aufgabenstellung || '',
+            quelltext: '',
+            thema: (task.aufgabenstellung || '').split(/\\n+/)[0].slice(0,120),
+            aufgabe_id: task.aufgabe_id,
+            turma_id: task.turma_id,
+            classroom: true
+          },
+          texto: '',
+          segundos_restantes: 0,
+          atualizado_em: new Date().toISOString()
+        };
+        localStorage.removeItem('sprachio_classroom_assignment');
+      }
+    }
+  } catch(e) {
+    console.warn('[Klassenaufgabe] localStorage-Übergabe konnte nicht gelesen werden:', e);
+  }
+
   // Aufgaben aus einer Klasse werden über aufgabe-turma.js geöffnet.
   // LocalStorage ist hier die zuverlässige Übergabe, damit kein Race
   // zwischen dem Trainer-Init und dem Einfügen des Cloud-Rascunhos entsteht.
