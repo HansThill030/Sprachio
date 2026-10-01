@@ -52,6 +52,10 @@
       <label>E-Mail</label>
       <input type="email" id="inputEmail" placeholder="name@example.com" autocomplete="email">
     </div>
+    <div class="form-group" id="nameGroup" style="display:none">
+      <label>Name</label>
+      <input type="text" id="inputName" placeholder="Dein Name" autocomplete="name">
+    </div>
     <div class="form-group">
       <label>Passwort</label>
       <input type="password" id="inputPassword" placeholder="Mindestens 6 Zeichen" autocomplete="current-password">
@@ -121,6 +125,7 @@ function atualizarUI(){
   $('authMsg').className = 'auth-msg';
 
   document.querySelector('#inputPassword').closest('.form-group').style.display = modoEsqueci ? 'none' : 'block';
+  $('nameGroup').style.display = modoRegistrar ? 'block' : 'none';
   $('forgotWrap').style.display = modoRegistrar ? 'none' : 'flex';
   document.querySelector('.divider').style.display = modoEsqueci ? 'none' : 'flex';
   $('btnGoogle').style.display = modoEsqueci ? 'none' : 'flex';
@@ -128,6 +133,7 @@ function atualizarUI(){
 }
 
 $('btnSubmit').addEventListener('click', async () => {
+  const name = $('inputName').value.trim();
   const email = $('inputEmail').value.trim();
   const password = $('inputPassword').value;
 
@@ -147,18 +153,25 @@ $('btnSubmit').addEventListener('click', async () => {
     return;
   }
 
+  if (modoRegistrar && !name) { showMsg('Bitte Namen eingeben.'); return; }
   if (!email || !password) { showMsg('Bitte E-Mail und Passwort eingeben.'); return; }
   setLoading(true);
   try {
     let result;
     if (modoRegistrar) {
-      result = await supabase.auth.signUp({ email, password });
+      result = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name }
+        }
+      });
     } else {
       result = await supabase.auth.signInWithPassword({ email, password });
     }
     if (result.error) throw result.error;
     if (modoRegistrar && !result.data.session) {
-      showMsg('Bestätigungs-E-Mail gesendet! Bitte Postfach prüfen.', 'ok');
+      showMsg('Konto erstellt. Falls die confirmação de e-mail estiver ativada no Supabase, confirme o e-mail para entrar.', 'ok');
     } else {
       location.href = '/trainer#/config';
     }
@@ -177,7 +190,7 @@ $('btnGoogle').addEventListener('click', async () => {
   if (error) { showMsg(error.message); setLoading(false); }
 });
 
-['inputEmail','inputPassword'].forEach(id => {
+['inputName','inputEmail','inputPassword'].forEach(id => {
   $(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') $('btnSubmit').click(); });
 });
 </script>
