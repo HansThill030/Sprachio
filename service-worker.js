@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sprachio-v2';
+const CACHE_NAME = 'sprachio-v3';
 const SHELL_FILES = [
   '/',
   '/trainer-hub',
@@ -44,18 +44,36 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return; // não intercepta chamadas externas (Supabase etc.)
   if (event.request.method !== 'GET') return;
 
+  // HTML/JS precisam sempre tentar a versão atual do servidor primeiro.
+  // Caso contrário, uma versão antiga do app.js pode continuar sendo usada
+  // mesmo depois de um deploy e quebrar o fluxo de entregas.
+  const isAppCode =
+    event.request.destination === 'document' ||
+    event.request.destination === 'script' ||
+    url.pathname.endsWith('.html') ||
+    url.pathname.endsWith('.js');
+
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetchPromise = fetch(event.request)
-        .then((networkResponse) => {
+    (isAppCode
+      ? fetch(event.request).then((networkResponse) => {
           if (networkResponse && networkResponse.ok) {
             const clone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
           return networkResponse;
+        }).catch(() => caches.match(event.request))
+      : caches.match(event.request).then((cached) => {
+          const fetchPromise = fetch(event.request)
+            .then((networkResponse) => {
+              if (networkResponse && networkResponse.ok) {
+                const clone = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+              }
+              return networkResponse;
+            })
+            .catch(() => cached);
+          return cached || fetchPromise;
         })
-        .catch(() => cached);
-      return cached || fetchPromise;
-    })
+    )
   );
 });
