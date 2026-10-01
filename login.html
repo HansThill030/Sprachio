@@ -84,11 +84,11 @@ const SUPABASE_KEY = window.SCHREIBTRAINER_CONFIG?.SUPABASE_ANON_KEY || "";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 supabase.auth.onAuthStateChange((event, session) => {
-  if (session) location.href = '/trainer#/config';
+  if (session) location.href = '/trainer-hub';
 });
 
 const { data: { session } } = await supabase.auth.getSession();
-if (session) location.href = '/trainer#/config';
+if (session) location.href = '/trainer-hub';
 
 let modoRegistrar = false;
 let modoEsqueci = false;
@@ -173,7 +173,7 @@ $('btnSubmit').addEventListener('click', async () => {
     if (modoRegistrar && !result.data.session) {
       showMsg('Konto erstellt. Bitte prüfe deine E-Mail, falls eine Bestätigung erforderlich ist.', 'ok');
     } else {
-      location.href = '/trainer#/config';
+      location.href = '/trainer-hub';
     }
   } catch(e) {
     showMsg(e.message || 'Fehler beim Anmelden.');
