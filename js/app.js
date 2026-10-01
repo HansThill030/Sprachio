@@ -1416,39 +1416,6 @@ if ($('btnNochmal')) $('btnNochmal').addEventListener('click', () => {
     console.warn('[Klassenaufgabe] localStorage-Übergabe konnte nicht gelesen werden:', e);
   }
 
-  // Aufgaben aus einer Klasse werden über aufgabe-turma.js geöffnet.
-  // LocalStorage ist hier die zuverlässige Übergabe, damit kein Race
-  // zwischen dem Trainer-Init und dem Einfügen des Cloud-Rascunhos entsteht.
-  let classroomDraft = null;
-  try {
-    const raw = localStorage.getItem('sprachio_classroom_assignment');
-    if (raw) {
-      const task = JSON.parse(raw);
-      if (task?.aufgabe_id && task?.turma_id) {
-        classroomDraft = {
-          user_id: _session.user.id,
-          niveau: task.niveau,
-          tipo_key: task.niveau === 'A2' ? 'email_informell' : task.niveau === 'C1' ? 'erörterung_grafik' : 'leserbrief',
-          schwierigkeit: 4,
-          aufgaba_obj: {
-            aufgabe: task.aufgabenstellung || '',
-            quelltext: '',
-            thema: (task.aufgabenstellung || '').split(/\\n+/)[0].slice(0,120),
-            aufgabe_id: task.aufgabe_id,
-            turma_id: task.turma_id,
-            classroom: true
-          },
-          texto: '',
-          segundos_restantes: 0,
-          atualizado_em: new Date().toISOString()
-        };
-        localStorage.removeItem('sprachio_classroom_assignment');
-      }
-    }
-  } catch(e) {
-    console.warn('[Klassenaufgabe] Übergabe konnte nicht gelesen werden:', e);
-  }
-
   const rascunhoNuvem = classroomDraft || await verificarRascunhoNuvem();
   if (rascunhoNuvem) {
     if (classroomDraft) {
