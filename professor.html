@@ -214,6 +214,15 @@ async function abrirTurma(turmaId){
   const resM = await sbFetch(`turma_membros?turma_id=eq.${turmaId}&select=user_id,joined_at`);
   const membros = await resM.json();
 
+  // Nomes dos alunos (vem do perfil público mínimo, não do auth.users)
+  let perfis = [];
+  if (membros.length) {
+    const ids = membros.map(m => `\"${m.user_id}\"`).join(',');
+    const resP = await sbFetch(`perfis?user_id=in.(${ids})&select=user_id,nome`);
+    perfis = await resP.json();
+    if (!Array.isArray(perfis)) perfis = [];
+  }
+
   // Histórico completo dos membros (RLS já garante que só vejo alunos das minhas turmas)
   let historicoTodos = [];
   if (membros.length) {
@@ -234,7 +243,8 @@ async function abrirTurma(turmaId){
     const registros = historicoTodos.filter(h => h.user_id === m.user_id);
     const melhor = registros.reduce((best, r) => niveauParaNum(r.nivel_atingido) > niveauParaNum(best) ? r.nivel_atingido : best, '');
     const ultima = registros[0]?.created_at ? new Date(registros[0].created_at).toLocaleDateString('de-DE') : '—';
-    return { user_id: m.user_id, count: registros.length, melhor: melhor || '—', ultima };
+    const perfil = perfis.find(p => p.user_id === m.user_id);
+    return { user_id: m.user_id, nome: perfil?.nome || 'Schüler', count: registros.length, melhor: melhor || '—', ultima };
   });
 
   $('app').innerHTML = `
@@ -273,7 +283,7 @@ async function abrirTurma(turmaId){
       <div>
         <div class="aluno-row">
           <div>
-            <div class="email">Schüler ${a.user_id.slice(0,8)}</div>
+            <div class="email">${escapeHtml(a.nome)}</div>
             <div class="stats">${a.count} Übungen · letzte: ${a.ultima}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
@@ -367,6 +377,8 @@ async function abrirTurma(turmaId){
     });
   }
 
+  const nomePorId = new Map(perfis.map(p => [p.user_id, p.nome || 'Schüler']));
+
   const entregasEl = $('entregasList');
   if (!Array.isArray(entregasTurma) || !entregasTurma.length) {
     entregasEl.innerHTML = '<div class="ms-empty">Noch keine Schülerabgaben.</div>';
@@ -383,7 +395,7 @@ async function abrirTurma(turmaId){
       const feedback = e.feedback || {};
       return `
         <div class="aufgaben-list-item" data-entrega-card="${e.id}">
-          <div class="meta">${escapeHtml(e.aluno_email || e.aluno_id)} · ${e.enviado_em ? new Date(e.enviado_em).toLocaleString('de-DE') : ''} · ${escapeHtml(statusLabel)}</div>
+          <div class="meta">${escapeHtml(nomePorId.get(e.aluno_id) || e.aluno_email || 'Schüler')} · ${e.enviado_em ? new Date(e.enviado_em).toLocaleString('de-DE') : ''} · ${escapeHtml(statusLabel)}</div>
           <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:8px;">Aufgabe: ${escapeHtml(aufgabe?.aufgabenstellung || e.tarefa_id)}</div>
           <div style="white-space:pre-wrap;line-height:1.65;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;font-size:0.92rem;">${escapeHtml(e.texto)}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
