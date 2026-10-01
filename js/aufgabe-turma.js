@@ -70,6 +70,15 @@
       task = Array.isArray(rows) ? rows[0] : null;
       if (!task) throw new Error('Aufgabe nicht gefunden.');
 
+      // Entrega os dados da tarefa diretamente ao Trainer. Isso evita uma
+      // corrida entre a inicialização do app.js e o POST do rascunho na nuvem.
+      localStorage.setItem('sprachio_classroom_assignment', JSON.stringify({
+        aufgabe_id: task.id,
+        turma_id: task.turma_id,
+        niveau: task.niveau,
+        aufgabenstellung: task.aufgabenstellung || ''
+      }));
+
       // rascunhos tem user_id como PRIMARY KEY. Upsert atualiza o rascunho
       // do aluno sem criar uma segunda linha.
       const draft = await rest('rascunhos', {
