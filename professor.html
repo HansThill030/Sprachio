@@ -227,6 +227,9 @@ async function abrirTurma(turmaId){
   const resA = await sbFetch(`aufgabas_turma?turma_id=eq.${turmaId}&select=*&order=created_at.desc`);
   const aufgabenTurma = await resA.json();
 
+  const resE = await sbFetch(`entregas_turma?turma_id=eq.${turmaId}&select=*&order=enviado_em.desc`);
+  const entregasTurma = await resE.json();
+
   const alunosStats = membros.map(m => {
     const registros = historicoTodos.filter(h => h.user_id === m.user_id);
     const melhor = registros.reduce((best, r) => niveauParaNum(r.nivel_atingido) > niveauParaNum(best) ? r.nivel_atingido : best, '');
@@ -250,6 +253,9 @@ async function abrirTurma(turmaId){
 
     <div class="section-label" style="margin-top:28px;">Geteilte Aufgaben</div>
     <div id="aufgabenList"></div>
+
+    <div class="section-label" style="margin-top:28px;">Schülerabgaben</div>
+    <div id="entregasList"></div>
   `;
 
   $('btnVoltar').addEventListener('click', renderHome);
@@ -357,6 +363,116 @@ async function abrirTurma(turmaId){
         if (!confirm('Diese Aufgabe wirklich löschen?')) return;
         await sbFetch(`aufgabas_turma?id=eq.${btn.dataset.delAufgabe}`, { method:'DELETE' });
         abrirTurma(turmaId);
+      });
+    });
+  }
+
+  const entregasEl = $('entregasList');
+  if (!Array.isArray(entregasTurma) || !entregasTurma.length) {
+    entregasEl.innerHTML = '<div class="ms-empty">Noch keine Schülerabgaben.</div>';
+  } else {
+    entregasEl.innerHTML = entregasTurma.map(e => {
+      const aufgabe = Array.isArray(aufgabenTurma) ? aufgabenTurma.find(a => a.id === e.tarefa_id) : null;
+      const statusLabel = {
+        enviada: 'Wartet auf Korrektur',
+        em_correcao_ia: 'KI korrigiert…',
+        corrigida_ia: 'Mit KI korrigiert',
+        corrigida_professora: 'Von Lehrkraft korrigiert',
+        recusada: 'Nicht korrigiert'
+      }[e.status] || e.status;
+      const feedback = e.feedback || {};
+      return `
+        <div class="aufgaben-list-item" data-entrega-card="${e.id}">
+          <div class="meta">${escapeHtml(e.aluno_email || e.aluno_id)} · ${e.enviado_em ? new Date(e.enviado_em).toLocaleString('de-DE') : ''} · ${escapeHtml(statusLabel)}</div>
+          <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:8px;">Aufgabe: ${escapeHtml(aufgabe?.aufgabenstellung || e.tarefa_id)}</div>
+          <div style="white-space:pre-wrap;line-height:1.65;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;font-size:0.92rem;">${escapeHtml(e.texto)}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+            ${e.status === 'enviada' ? `<button class="primary" data-ia-entrega="${e.id}">Korrektur mit KI</button>` : ''}
+            <button class="ghost" data-toggle-feedback="${e.id}">${e.feedback ? 'Feedback anzeigen' : 'Nur ansehen'}</button>
+          </div>
+          <div id="feedback-entrega-${e.id}" style="display:none;margin-top:12px;"></div>
+        </div>`;
+    }).join('');
+
+    entregasEl.querySelectorAll('[data-toggle-feedback]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.toggleFeedback;
+        const entrega = entregasTurma.find(e => e.id === id);
+        const wrap = document.getElementById('feedback-entrega-' + id);
+        if (!wrap) return;
+        wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+        if (wrap.style.display === 'block') {
+          if (!entrega?.feedback) {
+            wrap.innerHTML = '<div style="font-size:0.84rem;color:var(--ink-soft);">Noch keine KI-Korrektur. Die Entscheidung liegt bei dir.</div>';
+          } else {
+            const fb = entrega.feedback;
+            wrap.innerHTML = `
+              <div class="hist-card">
+                <strong>${escapeHtml(fb.niveau_einschaetzung || fb.status || 'Korrektur')}</strong>
+                <p>${escapeHtml(fb.erfuellung || '')}</p>
+                <p>${escapeHtml(fb.aufbau || '')}</p>
+                <p>${escapeHtml(fb.sprache || '')}</p>
+                <div class="tip-box">→ ${escapeHtml(fb.tipp || '')}</div>
+              </div>`;
+          }
+        }
+      });
+    });
+
+    entregasEl.querySelectorAll('[data-ia-entrega]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const entrega = entregasTurma.find(e => e.id === btn.dataset.iaEntrega);
+        if (!entrega) return;
+        if (!confirm('Diesen Text wirklich mit KI korrigieren?')) return;
+        btn.disabled = true;
+        btn.textContent = 'KI korrigiert…';
+        try {
+          const aufgabe = Array.isArray(aufgabenTurma) ? aufgabenTurma.find(a => a.id === entrega.tarefa_id) : null;
+          const prompt = `Du bist eine erfahrene Deutschlehrkraft. Korrigiere den folgenden Schülertext zu dieser von der Lehrkraft gestellten Aufgabe.
+Niveau: ${aufgabe?.niveau || 'B1'}
+Aufgabe:
+${aufgabe?.aufgabenstellung || ''}
+
+Schülertext:
+"""
+${entrega.texto}
+"""
+
+Bewerte kurz Aufgabenerfüllung, Aufbau sowie Sprache/Grammatik und nenne maximal 6 konkrete Korrekturen.
+Antworte ausschließlich als JSON:
+{"niveau_einschaetzung":"...","status":"erreicht|knapp erreicht|noch nicht erreicht","erfuellung":"...","aufbau":"...","sprache":"...","korrekturen":[{"original":"...","korrektur":"...","erklaerung":"..."}],"tipp":"..." }`;
+          await sbFetch(`entregas_turma?id=eq.${encodeURIComponent(entrega.id)}`, {
+            method:'PATCH',
+            headers:{Prefer:'return=minimal'},
+            body:JSON.stringify({status:'em_correcao_ia'})
+          });
+          const response = await fetch(`${SUPABASE_URL}/functions/v1/gemini-proxy`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},
+            body:JSON.stringify({prompt,max_tokens:5000})
+          });
+          const data = await response.json();
+          if (!response.ok || data.error) throw new Error(data.error || 'KI-Fehler');
+          let raw = String(data.text || '').trim().replace(/^\`\`\`json\s*/,'').replace(/^\`\`\`\s*/,'').replace(/\s*\`\`\`$/,'');
+          const feedback = JSON.parse(raw);
+          const update = await sbFetch(`entregas_turma?id=eq.${encodeURIComponent(entrega.id)}`, {
+            method:'PATCH',
+            headers:{Prefer:'return=minimal'},
+            body:JSON.stringify({status:'corrigida_ia',feedback,corrigido_em:new Date().toISOString()})
+          });
+          if (!update.ok) throw new Error(await update.text());
+          abrirTurma(turmaId);
+        } catch(e) {
+          console.error(e);
+          await sbFetch(`entregas_turma?id=eq.${encodeURIComponent(entrega.id)}`, {
+            method:'PATCH',
+            headers:{Prefer:'return=minimal'},
+            body:JSON.stringify({status:'enviada'})
+          });
+          alert('Die KI-Korrektur konnte nicht durchgeführt werden. Der Text bleibt zur manuellen Entscheidung offen.');
+          btn.disabled = false;
+          btn.textContent = 'Korrektur mit KI';
+        }
       });
     });
   }
