@@ -292,6 +292,7 @@ async function abrirTurma(turmaId){
           <div style="display:flex;gap:8px;align-items:center;">
             <span class="badge">${escapeHtml(a.melhor)}</span>
             <button class="btn-sair" data-verlauf="${a.user_id}" style="font-family:inherit;font-size:0.74rem;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;">Verlauf</button>
+            <button class="btn-sair" data-reset-senha="${a.user_id}" style="font-family:inherit;font-size:0.74rem;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;">Passwort zurücksetzen</button>
             <button class="btn-sair" data-remover="${a.user_id}" style="font-family:inherit;font-size:0.74rem;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;">Entfernen</button>
           </div>
         </div>
@@ -342,6 +343,52 @@ async function abrirTurma(turmaId){
               ${r.tipp ? `<div class="hist-tipp">→ ${escapeHtml(r.tipp)}</div>` : ''}
             </div>`).join('');
           wrap.innerHTML = `<div style="font-size:0.76rem;font-weight:700;color:var(--ink-faint);margin:8px 0;">Abgegebene Klassenaufgaben</div>${entregasHtml || '<div class="ms-empty">Keine Klassenaufgaben abgegeben.</div>'}<div style="font-size:0.76rem;font-weight:700;color:var(--ink-faint);margin:14px 0 8px;">Freie Übungen</div>${historicoHtml || '<div class="ms-empty">Keine freien Übungen.</div>'}`;        }
+      });
+    });
+
+    alunosEl.querySelectorAll('[data-reset-senha]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const uid = btn.dataset.resetSenha;
+        const senha = prompt('Neues Passwort für diesen Schüler eingeben (mindestens 8 Zeichen):');
+        if (senha === null) return;
+        if (senha.length < 8) {
+          alert('Das Passwort muss mindestens 8 Zeichen lang sein.');
+          return;
+        }
+
+        btn.disabled = true;
+        const textoOriginal = btn.textContent;
+        btn.textContent = 'Speichern…';
+
+        try {
+          const { data, error } = await supabase.functions.invoke('admin-reset-user-password', {
+            body: {
+              user_id: uid,
+              password: senha
+            }
+          });
+
+          if (error) {
+            let detail = error.message || 'Unbekannter Fehler';
+            try {
+              if (error.context) {
+                const payload = await error.context.json();
+                detail = payload?.error || payload?.message || detail;
+              }
+            } catch (_) {}
+            throw new Error(detail);
+          }
+
+          if (!data?.ok) throw new Error(data?.error || 'Passwort konnte nicht zurückgesetzt werden.');
+
+          alert('Passwort erfolgreich zurückgesetzt.');
+        } catch (e) {
+          console.error('Passwort zurücksetzen:', e);
+          alert('Passwort konnte nicht zurückgesetzt werden: ' + (e.message || e));
+        } finally {
+          btn.disabled = false;
+          btn.textContent = textoOriginal;
+        }
       });
     });
 
