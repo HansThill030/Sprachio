@@ -1,14 +1,16 @@
-const CACHE_NAME = 'sprachio-v3';
+const CACHE_NAME = 'sprachio-v4';
 const SHELL_FILES = [
   '/',
   '/trainer-hub',
   '/trainer',
+  '/aufgabe-turma',
   '/login',
   '/historico',
   '/vokabeln',
   '/freie-korrektur',
   '/professor',
   '/minhas-turmas',
+  '/assets/mark.png',
   '/datenschutz',
   '/nutzungsbedingungen',
   '/css/styles.css',
