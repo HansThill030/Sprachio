@@ -120,6 +120,14 @@
 .onboarding-steps li{font-size:0.86rem;color:var(--ink-soft);padding:8px 0;border-top:1px solid var(--line);}
 .onboarding-steps li:first-child{border-top:none;}
 .onboarding-steps b{color:var(--ink);}
+
+.progress-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.progress-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;}
+.progress-card .num{font-family:"Space Grotesk",sans-serif;font-size:1.35rem;font-weight:700;}
+.progress-card .lbl{font-size:.75rem;color:var(--ink-faint);margin-top:3px;}
+.error-list{display:grid;gap:8px;}
+.error-item{display:flex;justify-content:space-between;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);}
+.error-item .err-main{min-width:0;}.error-item .err-original{font-weight:600;}.error-item .err-correct{font-size:.8rem;color:var(--ok);margin-top:3px;}.error-item .err-count{font-size:.72rem;color:var(--ink-faint);white-space:nowrap;}
 </style>
 </head>
 <body>
