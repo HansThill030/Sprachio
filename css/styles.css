@@ -607,3 +607,10 @@ button,a,.niveau-btn,.teil-btn,.modus-tab,.ms-card{touch-action:manipulation;}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
 }
+
+.install-banner{display:none;margin:0 0 22px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);align-items:center;justify-content:space-between;gap:12px;}
+.install-banner.show{display:flex;}
+.install-banner .txt{font-size:.84rem;color:var(--ink-soft);}
+.install-banner .txt strong{display:block;color:var(--ink);font-size:.9rem;margin-bottom:2px;}
+.install-banner button{flex-shrink:0;padding:9px 14px;font-size:.8rem;}
+@media(max-width:520px){.install-banner{align-items:stretch;flex-direction:column}.install-banner button{width:100%;}}
