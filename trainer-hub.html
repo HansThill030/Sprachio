@@ -90,6 +90,20 @@
 }
 
 /* Onboarding — primeira visita ao Hub */
+.class-assignment-list{display:grid;gap:10px;}
+.class-assignment{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 18px;display:flex;justify-content:space-between;align-items:center;
+  gap:14px;flex-wrap:wrap;
+}
+.class-assignment .ca-main{min-width:0;flex:1;}
+.class-assignment .ca-class{font-size:.72rem;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.class-assignment .ca-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.98rem;margin-bottom:4px;}
+.class-assignment .ca-meta{font-size:.76rem;color:var(--ink-faint);}
+.class-assignment .ca-status{font-size:.74rem;font-weight:700;padding:5px 10px;border-radius:20px;background:var(--bg);color:var(--ink-soft);}
+.class-assignment .ca-status.done{color:var(--ok);}
+.class-assignment .ca-status.open{color:var(--accent);}
+
 .onboarding-overlay{
   display:none;position:fixed;inset:0;background:rgba(21,19,31,0.55);
   z-index:150;align-items:center;justify-content:center;padding:20px;
@@ -131,6 +145,11 @@
   </section>
 
   <div id="loginBannerWrap"></div>
+
+  <div class="hub-section" id="classAssignmentsSection" style="display:none;">
+    <div class="hub-section-head"><span class="icon">📋</span><h3>Aufgaben deiner Klassen</h3></div>
+    <div id="classAssignmentsList"></div>
+  </div>
 
   <div class="hub-section">
     <div class="hub-section-head"><span class="icon">🎯</span><h3>Üben</h3></div>
@@ -275,6 +294,53 @@ if (SUPABASE_URL) {
     return fetch(`${SUPABASE_URL}/rest/v1/${path}`, Object.assign({}, options, { headers }));
   }
 
+  async function carregarAufgabenTurmas(){
+    const section = document.getElementById('classAssignmentsSection');
+    const list = document.getElementById('classAssignmentsList');
+    if (!section || !list || !sessaoAtual) return;
+    try {
+      const rm = await sbFetch('turma_membros?user_id=eq.' + encodeURIComponent(sessaoAtual.user.id) + '&select=turma_id,turmas(id,nome)');
+      if (!rm.ok) throw new Error('membership lookup failed');
+      const memberships = await rm.json();
+      if (!Array.isArray(memberships) || !memberships.length) return;
+
+      const turmaIds = [...new Set(memberships.map(m => m.turma_id).filter(Boolean))];
+      const turmaMap = Object.fromEntries(memberships.map(m => [m.turma_id, m.turmas?.nome || 'Klasse']));
+      const inIds = turmaIds.map(id => '"' + id + '"').join(',');
+      const ra = await sbFetch('aufgabas_turma?turma_id=in.(' + inIds + ')&select=id,turma_id,niveau,aufgabenstellung,created_at&order=created_at.desc&limit=12');
+      if (!ra.ok) throw new Error('assignment lookup failed');
+      const assignments = await ra.json();
+      if (!Array.isArray(assignments) || !assignments.length) return;
+
+      const taskIds = assignments.map(a => a.id);
+      const taskIn = taskIds.map(id => '"' + id + '"').join(',');
+      const re = await sbFetch('entregas_turma?aluno_id=eq.' + encodeURIComponent(sessaoAtual.user.id) + '&tarefa_id=in.(' + taskIn + ')&select=tarefa_id,status,enviado_em');
+      const submissions = re.ok ? await re.json() : [];
+      const submissionMap = Object.fromEntries((Array.isArray(submissions) ? submissions : []).map(s => [s.tarefa_id, s]));
+
+      section.style.display = 'block';
+      list.className = 'class-assignment-list';
+      list.innerHTML = assignments.map(a => {
+        const sub = submissionMap[a.id];
+        const statusDone = !!sub;
+        const status = statusDone ? 'Abgegeben' : 'Offen';
+        const title = String(a.aufgabenstellung || 'Aufgabe').split(/\n+/)[0].slice(0,140);
+        const date = a.created_at ? new Date(a.created_at).toLocaleDateString('de-DE') : '';
+        return '<div class="class-assignment">' +
+          '<div class="ca-main">' +
+          '<div class="ca-class">' + escapeHtml(turmaMap[a.turma_id] || 'Klasse') + ' · ' + escapeHtml(a.niveau || '') + '</div>' +
+          '<div class="ca-title">' + escapeHtml(title) + '</div>' +
+          '<div class="ca-meta">' + escapeHtml(date) + '</div>' +
+          '</div>' +
+          '<span class="ca-status ' + (statusDone ? 'done' : 'open') + '">' + status + '</span>' +
+          (statusDone ? '' : '<a class="primary" href="/aufgabe-turma?id=' + encodeURIComponent(a.id) + '" style="padding:9px 14px;font-size:.78rem;">Aufgabe öffnen →</a>') +
+          '</div>';
+      }).join('');
+    } catch(e) {
+      console.error('Klassenaufgaben:', e);
+    }
+  }
+
   document.getElementById('btnEntrarTurma')?.addEventListener('click', async () => {
     const msgEl = document.getElementById('turmaJoinMsg');
     const codigo = document.getElementById('inputCodigoTurma').value.trim().toUpperCase();
@@ -318,6 +384,7 @@ if (SUPABASE_URL) {
       msgEl.textContent = 'Fehler beim Beitreten. Bitte Code prüfen und erneut versuchen.';
     }
   });
+  carregarAufgabenTurmas();
 }
 </script>
 <script>
