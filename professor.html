@@ -58,6 +58,10 @@
 .teacher-summary-card .label{font-size:.74rem;color:var(--ink-faint);margin-top:3px;}
 @media(max-width:620px){.teacher-summary{grid-template-columns:1fr 1fr}.teacher-summary-card:last-child{grid-column:1/-1;}}
 .no-access{text-align:center;padding:80px 20px;color:var(--ink-soft);}
+
+.teacher-analytics{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin:0 0 28px;}
+.teacher-analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px;}
+.teacher-analytics-card{border:1px solid var(--line);border-radius:var(--r-sm);padding:13px;background:var(--bg);}.teacher-analytics-card .v{font-family:"Space Grotesk",sans-serif;font-size:1.3rem;font-weight:700}.teacher-analytics-card .l{font-size:.72rem;color:var(--ink-faint)}
 </style>
 </head>
 <body>
@@ -163,6 +167,35 @@ async function carregarTurmas(){
   }
 }
 
+
+async function carregarAnalyticaProfessor(){
+  const grid=$('teacherAnalyticsGrid'), focus=$('teacherAnalyticsFocus');
+  if(!grid||!focus) return;
+  try{
+    const ids=[];
+    for(const t of turmas){
+      const r=await sbFetch('turma_membros?turma_id=eq.'+encodeURIComponent(t.id)+'&select=user_id');
+      const ms=await r.json(); if(Array.isArray(ms)) ms.forEach(m=>{if(m.user_id&&!ids.includes(m.user_id))ids.push(m.user_id);});
+    }
+    if(!ids.length){grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Noch keine Schülerdaten.</div>';return;}
+    const inIds=ids.map(id=>'"'+id+'"').join(',');
+    const [rh,re]=await Promise.all([
+      sbFetch('historico?user_id=in.('+inIds+')&select=user_id,nivel_atingido,status,created_at'),
+      sbFetch('erros_aprendizagem?user_id=in.('+inIds+')&select=user_id,subcategoria,created_at')
+    ]);
+    const hist=rh.ok?await rh.json():[]; const errs=re.ok?await re.json():[];
+    const h=Array.isArray(hist)?hist:[], e=Array.isArray(errs)?errs:[];
+    const active30=new Set(h.filter(x=>Date.now()-new Date(x.created_at).getTime()<=30*86400000).map(x=>x.user_id)).size;
+    const reached=h.filter(x=>['erreicht','übertroffen'].includes(x.status)||String(x.nivel_atingido||'').includes('erreicht')).length;
+    grid.innerHTML=[
+      [ids.length,'Schüler/innen'],[h.length,'Korrekturen'],[active30,'Aktiv in 30 Tagen'],[reached,'Erfolgreiche Ergebnisse'],[e.length,'Erfasste Fehler']
+    ].map(x=>'<div class="teacher-analytics-card"><div class="v">'+escapeHtml(String(x[0]))+'</div><div class="l">'+escapeHtml(x[1])+'</div></div>').join('');
+    const counts=new Map();e.forEach(x=>{const k=x.subcategoria||'Grammatik';counts.set(k,(counts.get(k)||0)+1);});
+    const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3);
+    focus.innerHTML=top.length?'Häufigste Lernfelder: <strong>'+top.map(x=>escapeHtml(x[0])+' ('+x[1]+'×)').join(' · ')+'</strong>':'Noch keine Fehlerdaten vorhanden.';
+  }catch(err){console.error('Klassenanalyse:',err);grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Analyse konnte nicht geladen werden.</div>';}
+}
+
 function renderHome(){
   turmaAtual = null;
   $('app').innerHTML = `
@@ -178,6 +211,12 @@ function renderHome(){
       <div class="teacher-summary-card"><div class="value">${turmas.length}</div><div class="label">Klassen</div></div>
       <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._count||0),0)}</div><div class="label">Schüler/innen</div></div>
       <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._aufgaben||0),0)}</div><div class="label">Geteilte Aufgaben</div></div>
+    </div>
+
+    <div class="teacher-analytics" id="teacherAnalytics">
+      <strong>Klassenanalyse</strong>
+      <div class="teacher-analytics-grid" id="teacherAnalyticsGrid"><div style="color:var(--ink-faint);font-size:.8rem;">Wird berechnet…</div></div>
+      <div id="teacherAnalyticsFocus" style="margin-top:12px;font-size:.82rem;color:var(--ink-soft);"></div>
     </div>
 
     <div class="section-label">Deine Klassen</div>
@@ -198,6 +237,8 @@ function renderHome(){
       card.addEventListener('click', () => abrirTurma(card.dataset.id));
     });
   }
+
+  carregarAnalyticaProfessor();
 
   $('btnCriarTurma').addEventListener('click', criarTurma);
   $('inputNomeTurma').addEventListener('keydown', (e) => { if (e.key === 'Enter') criarTurma(); });
