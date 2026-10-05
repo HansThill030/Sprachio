@@ -387,6 +387,37 @@ if (SUPABASE_URL) {
   carregarAufgabenTurmas();
 }
 </script>
+<div class="install-banner" id="installBanner" role="status" aria-live="polite">
+  <div class="txt"><strong>Sprachio installieren</strong>Auf deinem Gerät schneller öffnen und wie eine App nutzen.</div>
+  <button class="primary" id="btnInstallApp" type="button">Installieren</button>
+</div>
+
+<script>
+(function(){
+  let deferredPrompt = null;
+  const banner = document.getElementById('installBanner');
+  const button = document.getElementById('btnInstallApp');
+  if (!banner || !button) return;
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) return;
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    banner.classList.add('show');
+  });
+  button.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    banner.classList.remove('show');
+  });
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    banner.classList.remove('show');
+  });
+})();
+</script>
+
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js').catch(()=>{}));
