@@ -554,3 +554,56 @@ button:focus:not(:focus-visible){
   pointer-events:none;
 }
 .rascunho-salvo-indicador.show{opacity:1;transform:translateY(0);}
+
+
+/* ---------- Responsive / mobile UX ---------- */
+button,a,.niveau-btn,.teil-btn,.modus-tab,.ms-card{touch-action:manipulation;}
+@media (max-width:720px){
+  body{padding:16px 14px 72px;font-size:15px;}
+  .wrap{width:100%;}
+  .masthead{margin-bottom:18px;padding-bottom:14px;gap:10px;}
+  .header-actions{gap:8px;width:100%;justify-content:flex-end;}
+  .hero{padding:34px 0 18px;}
+  .hero .logo-big{margin-bottom:20px;width:48px;}
+  .hero h2{font-size:clamp(1.85rem,10vw,2.55rem);max-width:16ch;}
+  .hero p{font-size:.96rem;}
+  .feature-grid{grid-template-columns:1fr;margin-top:34px;}
+  .feature-card{padding:18px 0;}
+  .cta-row{margin-top:30px;}
+  .big-cta{display:flex;justify-content:center;align-items:center;width:100%;min-height:48px;}
+  .action-grid,.level-grid{grid-template-columns:1fr;}
+  .action-card{padding:17px;}
+  .auth-wrap{margin:22px auto 0;padding:0;}
+  .auth-card{padding:24px 18px;}
+  .auth-btn{min-height:46px;}
+  .niveau-btn{min-width:calc(50% - 3px);flex:1 1 calc(50% - 3px);}
+  .teile{grid-template-columns:1fr;}
+  .nav-row{flex-direction:column-reverse;}
+  .nav-row button,.nav-row a{width:100%;text-align:center;}
+  .card-actions{flex-direction:column;align-items:stretch;}
+  .card-actions button,.card-actions a{width:100%;text-align:center;}
+  .aufgabe-card{padding:17px;}
+  .schreibfeld-wrap{padding:15px 16px 12px;}
+  textarea{min-height:240px;font-size:1rem;}
+  .feedback{padding:18px;}
+  .stamp{position:static;display:inline-block;margin-bottom:18px;}
+  .fb-section,.tip-box{max-width:100%;}
+  .fb-table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
+  .cookie-banner-inner{padding:13px 14px;align-items:stretch;}
+  .cookie-banner-btns{width:100%;}
+  .cookie-banner-btns button{flex:1;min-height:44px;}
+  #themeToggle{right:14px;bottom:14px;}
+  .rascunho-salvo-indicador{right:14px;bottom:68px;}
+}
+@media (max-width:420px){
+  .brand .sub{display:none;}
+  .masthead .home-link{font-size:.78rem;}
+  .hub-intro{padding-top:12px;}
+  .niveau-row{gap:5px;}
+  .niveau-btn{min-width:100%;}
+  .aufgaben-overlay{padding:10px;}
+  .aufgaben-modal{padding:18px 15px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+}
