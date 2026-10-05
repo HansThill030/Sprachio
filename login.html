@@ -103,9 +103,9 @@ if (session) location.href = '/trainer-hub';
 
 let modoRegistrar = false;
 let modoEsqueci = false;
+const $ = id => document.getElementById(id);
 const authChoice = $('authChoice');
 const authForm = $('authForm');
-const $ = id => document.getElementById(id);
 
 function showAuthForm(register = false){
   modoRegistrar = register;
