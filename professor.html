@@ -52,6 +52,11 @@
   padding:12px 16px;margin-bottom:8px;font-size:0.88rem;
 }
 .aufgaben-list-item .meta{font-size:0.72rem;color:var(--ink-faint);margin-bottom:4px;}
+.teacher-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 28px;}
+.teacher-summary-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;}
+.teacher-summary-card .value{font-family:'Space Grotesk',sans-serif;font-size:1.55rem;font-weight:700;}
+.teacher-summary-card .label{font-size:.74rem;color:var(--ink-faint);margin-top:3px;}
+@media(max-width:620px){.teacher-summary{grid-template-columns:1fr 1fr}.teacher-summary-card:last-child{grid-column:1/-1;}}
 .no-access{text-align:center;padding:80px 20px;color:var(--ink-soft);}
 </style>
 </head>
@@ -149,6 +154,11 @@ async function carregarTurmas(){
       const r = await sbFetch(`turma_membros?turma_id=eq.${t.id}&select=user_id`);
       const membros = await r.json();
       t._count = Array.isArray(membros) ? membros.length : 0;
+      try {
+        const a = await sbFetch(`aufgabas_turma?turma_id=eq.${t.id}&select=id`);
+        const tarefas = await a.json();
+        t._aufgaben = Array.isArray(tarefas) ? tarefas.length : 0;
+      } catch(e) { t._aufgaben = 0; }
     } catch(e) { t._count = 0; }
   }
 }
@@ -162,6 +172,12 @@ function renderHome(){
     <div class="form-inline">
       <input type="text" id="inputNomeTurma" placeholder="Name der Klasse (z.B. 9A Deutsch)">
       <button class="primary" id="btnCriarTurma">+ Klasse erstellen</button>
+    </div>
+
+    <div class="teacher-summary">
+      <div class="teacher-summary-card"><div class="value">${turmas.length}</div><div class="label">Klassen</div></div>
+      <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._count||0),0)}</div><div class="label">Schüler/innen</div></div>
+      <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._aufgaben||0),0)}</div><div class="label">Geteilte Aufgaben</div></div>
     </div>
 
     <div class="section-label">Deine Klassen</div>
