@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex,nofollow">
 <script src="js/theme.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Aufgabe — Sprachio</title>
+<title>Atividade da turma — Sprachio</title>
 <link rel="icon" href="assets/mark.png">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div class="wrap"><div class="hist-loading" id="status">Aufgabe wird geöffnet&hellip;</div></div>
+<div class="wrap"><div class="hist-loading" id="status">Abrindo atividade da turma&hellip;</div></div>
 <script src="js/config.js"></script>
 <script type="module">
 const p=new URLSearchParams(location.search);
 const id=p.get('id');
-if(!id){document.getElementById('status').textContent='Keine Aufgabe angegeben.';}
+if(!id){document.getElementById('status').textContent='Nenhuma atividade foi informada.';}
 else{location.replace(`/trainer?aufgabe_id=${encodeURIComponent(id)}`);}
 </script>
 </body>
