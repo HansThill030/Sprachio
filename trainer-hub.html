@@ -105,7 +105,7 @@
 .class-assignment .ca-meta{font-size:.76rem;color:var(--ink-faint);}
 .class-assignment .ca-status{font-size:.74rem;font-weight:700;padding:5px 10px;border-radius:20px;background:var(--bg);color:var(--ink-soft);}
 .class-assignment .ca-status.done{color:var(--ok);}
-.class-assignment .ca-status.open{color:var(--accent);}
+.class-assignment .ca-status.open{color:var(--accent);}.class-assignment.pending{border-color:var(--accent);}.class-assignment.done{opacity:.82}.assignment-banner{background:var(--ink);color:#fff;border-radius:var(--r);padding:18px 20px;margin-bottom:14px}.assignment-banner strong{font-family:'Space Grotesk',sans-serif;font-size:1rem}.assignment-banner span{display:block;color:rgba(255,255,255,.72);font-size:.8rem;margin-top:4px}
 
 .onboarding-overlay{
   display:none;position:fixed;inset:0;background:rgba(21,19,31,0.55);
@@ -171,7 +171,7 @@
 
   <div class="hub-section" id="classAssignmentsSection" data-nav-section="atividades" style="display:none;">
     <div class="hub-section-head"><span class="icon">📋</span><h3>Atividades da turma</h3></div>
-    <div id="classAssignmentsList"></div>
+    <div id="assignmentBanner"></div><div id="classAssignmentsList"></div>
   </div>
 
   <div class="hub-section">
@@ -458,6 +458,7 @@ if (SUPABASE_URL) {
   async function carregarAtividadenTurmas(){
     const section = document.getElementById('classAssignmentsSection');
     const list = document.getElementById('classAssignmentsList');
+    const banner = document.getElementById('assignmentBanner');
     if (!section || !list || !sessaoAtual) return;
     try {
       const rm = await sbFetch('turma_membros?user_id=eq.' + encodeURIComponent(sessaoAtual.user.id) + '&select=turma_id,turmas(id,nome)');
@@ -480,16 +481,17 @@ if (SUPABASE_URL) {
       const submissionMap = Object.fromEntries((Array.isArray(submissions) ? submissions : []).map(s => [s.tarefa_id, s]));
 
       section.style.display = 'block';
+      if (banner) banner.innerHTML = '<div class="assignment-banner"><strong>Atividades da sua turma</strong><span>Comece pelas atividades que ainda estão pendentes.</span></div>';
       list.className = 'class-assignment-list';
       list.innerHTML = assignments.map(a => {
         const sub = submissionMap[a.id];
         const statusDone = !!sub;
         const status = statusDone ? 'Entregue' : 'Pendente';
         const title = String(a.aufgabenstellung || 'Aufgabe').split(/\n+/)[0].slice(0,140);
-        const date = a.created_at ? new Date(a.created_at).toLocaleDateString('de-DE') : '';
-        return '<div class="class-assignment">' +
+        const date = a.created_at ? new Date(a.created_at).toLocaleDateString('pt-BR') : '';
+        return '<div class="class-assignment ' + (statusDone ? 'done' : 'pending') + '">' +
           '<div class="ca-main">' +
-          '<div class="ca-class">' + escapeHtml(turmaMap[a.turma_id] || 'Klasse') + ' · ' + escapeHtml(a.niveau || '') + '</div>' +
+          '<div class="ca-class">' + escapeHtml(turmaMap[a.turma_id] || 'Turma') + ' · ' + escapeHtml(a.niveau || '') + '</div>' +
           '<div class="ca-title">' + escapeHtml(title) + '</div>' +
           '<div class="ca-meta">' + escapeHtml(date) + '</div>' +
           '</div>' +
@@ -542,7 +544,7 @@ if (SUPABASE_URL) {
       document.getElementById('inputCodigoTurma').value = '';
     } catch(e) {
       msgEl.style.display = 'block'; msgEl.style.color = 'var(--err)';
-      msgEl.textContent = 'Fehler beim Entrar na turma. Bitte Code prüfen und erneut versuchen.';
+      msgEl.textContent = 'Não foi possível entrar na turma. Verifique o código e tente novamente.';
     }
   });
   carregarAufgabenTurmas();
