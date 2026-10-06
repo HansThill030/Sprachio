@@ -257,7 +257,7 @@
     </div>
   </div>
 
-  <nav class="mobile-bottom-nav" aria-label="Navegação principal"><a href="/trainer-hub"><strong>⌂</strong>Início</a><a href="#atividades"><strong>✓</strong>Atividades</a><a href="/trainer#/config"><strong>✎</strong>Praticar</a><a href="#progresso"><strong>↗</strong>Progresso</a></nav>
+  <nav class="mobile-bottom-nav" aria-label="Navegação principal"><a href="/trainer-hub"><strong>⌂</strong>Início</a><a href="#classAssignmentsSection"><strong>✓</strong>Atividades</a><a href="/trainer#/config"><strong>✎</strong>Praticar</a><a href="#personalProgressSection"><strong>↗</strong>Progresso</a></nav>
 
   <footer class="site-footer">
     <a class="brand" href="/">
@@ -297,6 +297,8 @@ if (SUPABASE_URL) {
   const bannerWrap = document.getElementById('loginBannerWrap');
   const greetLabel = document.getElementById('greetLabel');
 
+  const teacherTile = document.getElementById('teacherModeTile');
+  if (!session) { if (teacherTile) teacherTile.style.display = 'none'; }
   if (session) {
     sessaoAtual = session;
     document.getElementById('userEmail').textContent = session.user.email;
