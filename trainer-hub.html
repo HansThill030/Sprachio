@@ -137,6 +137,9 @@
 .progress-level{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.84rem;color:var(--ink-soft);}
 .progress-level strong{color:var(--ink);}
 
+
+.mobile-bottom-nav{display:none;}
+@media(max-width:720px){.mobile-bottom-nav{position:sticky;bottom:10px;z-index:40;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px;margin:18px 0;box-shadow:0 8px 24px rgba(0,0,0,.10)}.mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 3px;border-radius:10px;font-size:.68rem;color:var(--ink-soft);text-decoration:none}.mobile-bottom-nav a strong{font-size:1.05rem;line-height:1}.mobile-bottom-nav a:hover{text-decoration:none;background:var(--bg);color:var(--ink)}}
 </style>
 </head>
 <body>
@@ -163,7 +166,7 @@
 
   <div id="loginBannerWrap"></div>
 
-  <div class="hub-section" id="classAssignmentsSection" style="display:none;">
+  <div class="hub-section" id="classAssignmentsSection" data-nav-section="atividades" style="display:none;">
     <div class="hub-section-head"><span class="icon">📋</span><h3>Atividades da turma</h3></div>
     <div id="classAssignmentsList"></div>
   </div>
@@ -184,7 +187,7 @@
     </div>
   </div>
 
-  <div class="hub-section" id="personalProgressSection" style="display:none;">
+  <div class="hub-section" id="personalProgressSection" data-nav-section="progresso" style="display:none;">
     <div class="hub-section-head"><span class="icon">📈</span><h3>Meu progresso</h3></div>
     <div class="progress-grid" id="progressMetrics"></div>
     <div class="progress-level" id="progressLevel" style="margin-top:12px;"></div>
@@ -195,7 +198,7 @@
     <div class="learning-focus" id="recommendationsList"></div>
   </div>
 
-  <div class="hub-section">
+  <div class="hub-section" data-nav-section="progresso">
     <div class="hub-section-head"><span class="icon">📈</span><h3>Progresso</h3></div>
     <div class="tile-grid-sm">
       <a class="tile-sm" href="/historico">
@@ -210,7 +213,7 @@
         <span class="tile-sm-icon">👥</span>
         <div class="tile-sm-title">Minhas turmas</div>
       </a>
-      <a class="tile-sm" href="/professor">
+      <a class="tile-sm" id="teacherModeTile" href="/professor">
         <span class="tile-sm-icon">🎓</span>
         <div class="tile-sm-title">Área do professor</div>
       </a>
@@ -254,6 +257,8 @@
     </div>
   </div>
 
+  <nav class="mobile-bottom-nav" aria-label="Navegação principal"><a href="/trainer-hub"><strong>⌂</strong>Início</a><a href="#atividades"><strong>✓</strong>Atividades</a><a href="/trainer#/config"><strong>✎</strong>Praticar</a><a href="#progresso"><strong>↗</strong>Progresso</a></nav>
+
   <footer class="site-footer">
     <a class="brand" href="/">
       <img src="assets/mark.png" alt="Sprachio" width="53" height="60">
@@ -271,9 +276,9 @@
     <h3>Bem-vindo ao Sprachio!</h3>
     <p>Veja rapidamente como usar a plataforma:</p>
     <ul class="onboarding-steps">
-      <li><b>🎯 Praticar alemão</b> — neue Aufgabe generieren lassen oder einen echten Modellsatz üben, sofort korrigiert von der KI.</li>
-      <li><b>📸 Corrigir um texto</b> — Foto eines handschriftlichen Textes hochladen (z.B. aus dem Unterricht) und korrigieren lassen.</li>
-      <li><b>🗂️ Vocabulário</b> — aus jeder Korrektur entstehen automatisch Karteikarten zum Wiederholen.</li>
+      <li><b>🎯 Praticar alemão</b> — crie um exercício ou pratique com um simulado e receba uma correção da IA.</li>
+      <li><b>📸 Corrigir um texto</b> — envie uma foto de um texto escrito à mão e receba uma correção.</li>
+      <li><b>🗂️ Vocabulário</b> — revise palavras importantes a partir das suas correções.</li>
       <li><b>🎓 Área do professor</b> — falls du unterrichtest: Klasse erstellen und den Progresso deiner Schüler/innen verfolgen.</li>
     </ul>
     <button class="primary" id="btnOnboardingClose" style="width:100%;">Começar →</button>
