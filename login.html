@@ -191,7 +191,8 @@ $('btnSubmit').addEventListener('click', async () => {
   }
 
   if (modoRegistrar && !name) { showMsg('Digite seu nome.'); return; }
-  if (!email || !password) { showMsg('Digite seu e-mail e sua senha.'); return; }\n  if (password.length < 8) { showMsg('A senha deve ter pelo menos 8 caracteres.'); return; }
+  if (!email || !password) { showMsg('Digite seu e-mail e sua senha.'); return; }
+  if (password.length < 8) { showMsg('A senha deve ter pelo menos 8 caracteres.'); return; }
   setLoading(true);
   try {
     let result;
