@@ -1,7 +1,7 @@
 const NIVEAUS = ['A2','B1','C1'];
 const NIVEAU_LABELS = { A2:'IVA 2', B1:'DSD I', C1:'DSD II' };
 const PAGE_ORDER = ['config','aufgabe','schreiben','korrektur'];
-const PAGE_LABELS = { config:'Konfiguration', aufgabe:'Aufgabe', schreiben:'Text', korrektur:'Korrektur' };
+const PAGE_LABELS = { config:'Escolher', aufgabe:'Atividade', schreiben:'Escrever', korrektur:'Resultado' };
 
 const TEXTSORTEN = {
   A2: [
@@ -1010,8 +1010,8 @@ function renderFeedbackIVA2(json){
     { key:'textaufbau',         label:'Textaufbau' },
     { key:'inhalt',             label:'Inhalt' },
     { key:'sprachliche_mittel', label:'Sprachliche Mittel' },
-    { key:'grammatik',          label:'Grammatik' },
-    { key:'orthografie',        label:'Orthografie' },
+    { key:'grammatik',          label:'Gramática' },
+    { key:'orthografie',        label:'Ortografia' },
   ];
   let bewertungHTML = `<table class="fb-table"><thead><tr><th>Kategorie</th><th>Pkt</th><th>Begründung</th></tr></thead><tbody>`;
   let gesamtPunkte = 0;
@@ -1030,12 +1030,12 @@ function renderFeedbackIVA2(json){
 
   let analyseHTML = '';
   if ((s4.grammatikfehler||[]).length) {
-    analyseHTML += '<strong>✗ Grammatikfehler</strong><ul class="analyse-list">';
+    analyseHTML += '<strong>✗ Erros de gramática</strong><ul class="analyse-list">';
     (s4.grammatikfehler||[]).forEach(f => { analyseHTML += `<li><span class="orig">${escapeHtml(f.original)}</span> → <span class="korr">${escapeHtml(f.zielstruktur)}</span><span class="erkl">${escapeHtml(f.kategorie)}</span></li>`; });
     analyseHTML += '</ul>';
   }
   if ((s4.orthografiefehler||[]).length) {
-    analyseHTML += '<strong>✗ Orthografiefehler</strong><ul class="analyse-list">';
+    analyseHTML += '<strong>✗ Erros de ortografia</strong><ul class="analyse-list">';
     (s4.orthografiefehler||[]).forEach(f => { analyseHTML += `<li><span class="orig">${escapeHtml(f.original)}</span> → <span class="korr">${escapeHtml(f.zielschreibung)}</span></li>`; });
     analyseHTML += '</ul>';
   }
@@ -1046,7 +1046,7 @@ function renderFeedbackIVA2(json){
   (s5.gut_gelungen || []).forEach(g => { const li = document.createElement('li'); li.innerHTML = `<span class="korr">✓</span> ${escapeHtml(g)}`; list.appendChild(li); });
   (s5.verbessern || []).forEach(v => { const li = document.createElement('li'); li.innerHTML = `<span class="orig">→</span> ${escapeHtml(v)}`; list.appendChild(li); });
 
-  $('fbTip').textContent = '🎯 Nächstes Lernziel: ' + (s5.naechstes_lernziel || '');
+  $('fbTip').textContent = 'Próximo objetivo: ' + (s5.naechstes_lernziel || '');
   $('loadingResult').style.display = 'none';
   $('feedback').style.display = 'block';
   const stamp = $('stamp');
@@ -1222,13 +1222,13 @@ function renderFeedbackDSD1(json){
   // Seção 1: Bewertung (8 categorias em tabela)
   const kategorien = [
     { key:'gesamteindruck',     label:'Gesamteindruck' },
-    { key:'wiedergabe',         label:'Wiedergabe' },
-    { key:'eigene_erfahrungen', label:'Eigene Erfahrungen' },
-    { key:'eigene_meinung',     label:'Eigene Meinung' },
-    { key:'wortschatz',         label:'Wortschatz' },
-    { key:'strukturen',         label:'Strukturen' },
-    { key:'grammatik',          label:'Grammatik' },
-    { key:'orthografie',        label:'Orthografie' },
+    { key:'wiedergabe',         label:'Reprodução do conteúdo' },
+    { key:'eigene_erfahrungen', label:'Experiências pessoais' },
+    { key:'eigene_meinung',     label:'Opinião pessoal' },
+    { key:'wortschatz',         label:'Vocabulário' },
+    { key:'strukturen',         label:'Estruturas' },
+    { key:'grammatik',          label:'Gramática' },
+    { key:'orthografie',        label:'Ortografia' },
   ];
 
   let bewertungHTML = `<table class="fb-table"><thead><tr><th>Kategorie</th><th>Pkt</th><th>Begründung</th></tr></thead><tbody>`;
@@ -1256,7 +1256,7 @@ function renderFeedbackDSD1(json){
 
   // Gelungene Strukturen
   if ((s4.gelungene_strukturen||[]).length) {
-    analyseHTML += '<strong>✓ Gelungene Strukturen</strong><ul class="analyse-list">';
+    analyseHTML += '<strong>✓ Estruturas bem utilizadas</strong><ul class="analyse-list">';
     (s4.gelungene_strukturen||[]).forEach(g => {
       analyseHTML += `<li><em>${escapeHtml(g.typ)}</em> — ${escapeHtml(g.beleg)}</li>`;
     });
@@ -1265,7 +1265,7 @@ function renderFeedbackDSD1(json){
 
   // Grammatikfehler
   if ((s4.grammatikfehler||[]).length) {
-    analyseHTML += '<strong>✗ Grammatikfehler</strong><ul class="analyse-list">';
+    analyseHTML += '<strong>✗ Erros de gramática</strong><ul class="analyse-list">';
     (s4.grammatikfehler||[]).forEach(f => {
       analyseHTML += `<li><span class="orig">${escapeHtml(f.original)}</span> → <span class="korr">${escapeHtml(f.zielstruktur)}</span><span class="erkl">${escapeHtml(f.kategorie)}</span></li>`;
     });
@@ -1274,7 +1274,7 @@ function renderFeedbackDSD1(json){
 
   // Orthografiefehler
   if ((s4.orthografiefehler||[]).length) {
-    analyseHTML += '<strong>✗ Orthografiefehler</strong><ul class="analyse-list">';
+    analyseHTML += '<strong>✗ Erros de ortografia</strong><ul class="analyse-list">';
     (s4.orthografiefehler||[]).forEach(f => {
       analyseHTML += `<li><span class="orig">${escapeHtml(f.original)}</span> → <span class="korr">${escapeHtml(f.zielschreibung)}</span></li>`;
     });
@@ -1299,7 +1299,7 @@ function renderFeedbackDSD1(json){
     list.appendChild(li);
   });
 
-  $('fbTip').textContent = '🎯 Nächstes Lernziel: ' + (s5.naechstes_lernziel || '');
+  $('fbTip').textContent = 'Próximo objetivo: ' + (s5.naechstes_lernziel || '');
 
   $('loadingResult').style.display = 'none';
   $('feedback').style.display = 'block';
@@ -1310,7 +1310,7 @@ function renderFeedbackDSD1(json){
 if ($('btnMusterloesung')) $('btnMusterloesung').addEventListener('click', async () => {
   const btn = $('btnMusterloesung');
   btn.disabled = true;
-  btn.textContent = 'Wird erstellt…';
+  btn.textContent = 'Criando…';
   $('musterloesungResult').innerHTML = '';
   const meta = currentMeta();
   const prompt = `Du bist DaF-Lehrkraft. Schreibe eine vorbildliche Musterlösung (Beispieltext) für folgende Aufgabe auf Niveau ${niveauLabel(state.niveau)} (Textsorte: ${meta.label}):
