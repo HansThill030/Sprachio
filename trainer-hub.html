@@ -128,6 +128,15 @@
 .error-list{display:grid;gap:8px;}
 .error-item{display:flex;justify-content:space-between;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);}
 .error-item .err-main{min-width:0;}.error-item .err-original{font-weight:600;}.error-item .err-correct{font-size:.8rem;color:var(--ok);margin-top:3px;}.error-item .err-count{font-size:.72rem;color:var(--ink-faint);white-space:nowrap;}
+.learning-focus{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;}
+.learning-recommendation{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:9px;}
+.learning-recommendation .rec-tag{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700;}
+.learning-recommendation .rec-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;}
+.learning-recommendation .rec-reason{font-size:.8rem;color:var(--ink-soft);line-height:1.5;flex:1;}
+.learning-recommendation .rec-action{align-self:flex-start;padding:8px 12px;font-size:.76rem;}
+.progress-level{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.84rem;color:var(--ink-soft);}
+.progress-level strong{color:var(--ink);}
+
 </style>
 </head>
 <body>
@@ -173,6 +182,17 @@
         <div class="tile-desc">Foto von handschriftlichem Text hochladen oder direkt tippen — z.B. Klassenarbeiten.</div>
       </a>
     </div>
+  </div>
+
+  <div class="hub-section" id="personalProgressSection" style="display:none;">
+    <div class="hub-section-head"><span class="icon">📈</span><h3>Dein Fortschritt</h3></div>
+    <div class="progress-grid" id="progressMetrics"></div>
+    <div class="progress-level" id="progressLevel" style="margin-top:12px;"></div>
+  </div>
+
+  <div class="hub-section" id="recommendationsSection" style="display:none;">
+    <div class="hub-section-head"><span class="icon">🎯</span><h3>Deine Empfehlungen</h3></div>
+    <div class="learning-focus" id="recommendationsList"></div>
   </div>
 
   <div class="hub-section">
@@ -302,6 +322,131 @@ if (SUPABASE_URL) {
     return fetch(`${SUPABASE_URL}/rest/v1/${path}`, Object.assign({}, options, { headers }));
   }
 
+  const REC_RULES = {
+    'Satzstellung': {
+      title: 'Satzbau & Verbposition',
+      reason: 'Du hast wiederholt Fehler bei der Wort- und Verbposition gemacht.',
+      action: 'B1 · Satzbau üben'
+    },
+    'Verbformen': {
+      title: 'Verbformen',
+      reason: 'Verbformen gehören zu deinen häufigsten Korrekturen.',
+      action: 'A2/B1 · Verben festigen'
+    },
+    'Kasus': {
+      title: 'Kasus & Endungen',
+      reason: 'Dativ, Akkusativ oder Genitiv tauchen mehrfach in deinen Korrekturen auf.',
+      action: 'A2/B1 · Kasus üben'
+    },
+    'Artikel': {
+      title: 'Artikel & Genus',
+      reason: 'Bei Artikeln und Genus gibt es wiederkehrende Unsicherheiten.',
+      action: 'A2 · Artikel festigen'
+    },
+    'Zeitform': {
+      title: 'Zeitformen',
+      reason: 'Bei der Wahl oder Bildung von Zeitformen wurden mehrere Fehler gefunden.',
+      action: 'B1 · Zeitformen üben'
+    }
+  };
+
+  function normalizeErrorCategory(value){
+    const v = String(value || '').trim();
+    if (REC_RULES[v]) return v;
+    const low = v.toLowerCase();
+    if (low.includes('satz')) return 'Satzstellung';
+    if (low.includes('verb')) return 'Verbformen';
+    if (low.includes('kasus') || low.includes('präposition')) return 'Kasus';
+    if (low.includes('artikel') || low.includes('genus')) return 'Artikel';
+    if (low.includes('zeit')) return 'Zeitform';
+    return v || 'Grammatik';
+  }
+
+  function levelRank(value){
+    const v = String(value || '').toUpperCase();
+    if (v.includes('C1')) return 4;
+    if (v.includes('B2')) return 3;
+    if (v.includes('B1')) return 2;
+    if (v.includes('A2')) return 1;
+    return 0;
+  }
+
+  function levelLabel(rank){
+    return ({1:'A2',2:'B1',3:'B2',4:'C1'})[rank] || 'A2';
+  }
+
+  async function carregarFortschrittERecomendacoes(){
+    if (!sessaoAtual) return;
+    const section = document.getElementById('personalProgressSection');
+    const metrics = document.getElementById('progressMetrics');
+    const levelEl = document.getElementById('progressLevel');
+    const recSection = document.getElementById('recommendationsSection');
+    const recList = document.getElementById('recommendationsList');
+    if (!section || !metrics || !recSection || !recList) return;
+
+    try {
+      const [histRes, errRes] = await Promise.all([
+        sbFetch('historico?select=id,niveau,nivel_atingido,status,created_at&order=created_at.desc&limit=100'),
+        sbFetch('erros_aprendizagem?select=id,categoria,subcategoria,original,correto,created_at&order=created_at.desc&limit=150')
+      ]);
+      if (!histRes.ok || !errRes.ok) throw new Error('analytics lookup failed');
+
+      const historico = await histRes.json();
+      const erros = await errRes.json();
+      if (!Array.isArray(historico)) return;
+
+      const now = Date.now();
+      const last30 = historico.filter(h => now - new Date(h.created_at).getTime() <= 30*86400000);
+      const reached = historico.filter(h => ['erreicht','übertroffen'].includes(String(h.status || '').toLowerCase())).length;
+      const bestRank = historico.reduce((max,h) => Math.max(max, levelRank(h.nivel_atingido || h.niveau)), 0);
+
+      section.style.display = 'block';
+      metrics.innerHTML =
+        '<div class="progress-card"><div class="num">' + historico.length + '</div><div class="lbl">Aktivitäten</div></div>' +
+        '<div class="progress-card"><div class="num">' + last30.length + '</div><div class="lbl">in den letzten 30 Tagen</div></div>' +
+        '<div class="progress-card"><div class="num">' + reached + '</div><div class="lbl">Ziele erreicht</div></div>' +
+        '<div class="progress-card"><div class="num">' + (Array.isArray(erros) ? erros.length : 0) + '</div><div class="lbl">erkannte Lernfehler</div></div>';
+
+      levelEl.innerHTML = '<strong>Höchstes bisher erkanntes Niveau:</strong> ' + levelLabel(bestRank);
+
+      const counts = {};
+      (Array.isArray(erros) ? erros : []).forEach(e => {
+        const category = normalizeErrorCategory(e.subcategoria || e.categoria);
+        counts[category] = (counts[category] || 0) + 1;
+      });
+
+      const recommendations = Object.entries(counts)
+        .sort((a,b) => b[1] - a[1])
+        .slice(0,3)
+        .map(([category,count]) => {
+          const rule = REC_RULES[category] || {
+            title: category,
+            reason: 'Dieser Bereich erscheint wiederholt in deinen Korrekturen.',
+            action: 'Gezielt üben'
+          };
+          return {category,count,...rule};
+        });
+
+      if (!recommendations.length) {
+        recSection.style.display = 'block';
+        recList.innerHTML = '<div class="learning-recommendation"><div class="rec-title">Noch keine Empfehlung</div><div class="rec-reason">Nach deiner ersten Korrektur analysiert Sprachio deine häufigsten Fehler und schlägt dir passende Übungen vor.</div><a class="primary rec-action" href="/trainer#/config">Training starten</a></div>';
+        return;
+      }
+
+      recSection.style.display = 'block';
+      recList.innerHTML = recommendations.map(r =>
+        '<div class="learning-recommendation">' +
+          '<div class="rec-tag">Lernfokus · ' + r.count + ' Korrekturen</div>' +
+          '<div class="rec-title">' + escapeHtml(r.title) + '</div>' +
+          '<div class="rec-reason">' + escapeHtml(r.reason) + '</div>' +
+          '<a class="primary rec-action" href="/trainer#/config">' + escapeHtml(r.action) + ' →</a>' +
+        '</div>'
+      ).join('');
+    } catch(e) {
+      console.error('Fortschritt/Empfehlungen:', e);
+    }
+  }
+
   async function carregarAufgabenTurmas(){
     const section = document.getElementById('classAssignmentsSection');
     const list = document.getElementById('classAssignmentsList');
@@ -393,6 +538,7 @@ if (SUPABASE_URL) {
     }
   });
   carregarAufgabenTurmas();
+  carregarFortschrittERecomendacoes();
 }
 </script>
 <div class="install-banner" id="installBanner" role="status" aria-live="polite">
