@@ -13,6 +13,14 @@
   --ok:#0f9d6d;
   --err:#dc3545;
   --warn:#b45309;
+  --surface-soft:#faf9ff;
+  --surface-selected:#f2f0ff;
+  --ok-soft:#eefaf4;
+  --ok-line:#bfe8d5;
+  --warn-soft:#fef9ec;
+  --warn-line:#f0ddb0;
+  --err-soft:#fdf1f1;
+  --err-line:#f3c9cb;
   --r:10px;
   --r-sm:8px;
 }
@@ -29,6 +37,14 @@
   --ok:#34d399;
   --err:#f87171;
   --warn:#fbbf24;
+  --surface-soft:#252238;
+  --surface-selected:#2d2744;
+  --ok-soft:#12352c;
+  --ok-line:#1f5d4b;
+  --warn-soft:#3a2d12;
+  --warn-line:#6b531b;
+  --err-soft:#3a2024;
+  --err-line:#6b3038;
 }
 :root[data-theme="dark"] body{background:var(--bg);}
 :root[data-theme="dark"] .form-group input,
@@ -171,7 +187,7 @@ h1,h2,h3{
   padding:20px;color:var(--ink);
   transition:background .15s ease;
 }
-.action-card:hover{background:#faf9ff;color:var(--ink);text-decoration:none;}
+.action-card:hover{background:var(--surface-soft);color:var(--ink);text-decoration:none;}
 .action-card.primary{background:var(--ink);color:#fff;}
 .action-card.primary:hover{background:var(--indigo);color:#fff;}
 .action-card .t{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;margin-bottom:6px;display:block;}
@@ -227,8 +243,8 @@ h1,h2,h3{
 .auth-toggle{text-align:center;margin-top:20px;font-size:0.86rem;color:var(--ink-soft);}
 .auth-toggle a{color:var(--accent);cursor:pointer;font-weight:600;}
 .auth-msg{font-size:0.83rem;padding:10px 12px;border-radius:var(--r-sm);margin-top:14px;display:none;border:1px solid;}
-.auth-msg.erro{background:#fdf1f1;color:var(--err);border-color:#f3c9cb;display:block;}
-.auth-msg.ok{background:#eefaf4;color:var(--ok);border-color:#bfe8d5;display:block;}
+.auth-msg.erro{background:var(--err-soft);color:var(--err);border-color:var(--err-line);display:block;}
+.auth-msg.ok{background:var(--ok-soft);color:var(--ok);border-color:var(--ok-line);display:block;}
 
 /* ---------- Stepper ---------- */
 .stepper{display:flex;gap:8px;margin-bottom:26px;}
@@ -290,7 +306,7 @@ input[type=range]{width:100%;accent-color:var(--indigo);}
 .ms-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1px;margin-bottom:16px;background:var(--line);border:1px solid var(--line);}
 .ms-card{background:var(--card);padding:13px 15px;cursor:pointer;transition:background .15s ease;}
 .ms-card:hover{background:#faf9ff;}
-.ms-card.selected{background:#f2f0ff;box-shadow:inset 2px 0 0 var(--indigo);}
+.ms-card.selected{background:var(--surface-selected);box-shadow:inset 2px 0 0 var(--indigo);}
 .ms-card .ms-num{font-size:0.66rem;font-weight:600;letter-spacing:0.06em;color:var(--indigo);display:block;margin-bottom:5px;text-transform:uppercase;}
 .ms-card .ms-thema{font-weight:600;font-size:0.96rem;}
 .ms-card .ms-type{font-size:0.76rem;color:var(--ink-soft);margin-top:4px;}
@@ -407,7 +423,7 @@ textarea::placeholder{color:var(--ink-faint);}
 .hist-thema{font-weight:600;font-size:1rem;}
 .hist-badge{font-size:0.7rem;font-weight:600;padding:4px 9px;border-radius:var(--r-sm);white-space:nowrap;flex-shrink:0;border:1px solid;}
 .hist-badge.gut{background:#eefaf4;color:var(--ok);border-color:#bfe8d5;}
-.hist-badge.ok{background:#fef9ec;color:var(--warn);border-color:#f0ddb0;}
+.hist-badge.ok{background:var(--warn-soft);color:var(--warn);border-color:var(--warn-line);}
 .hist-badge.schlecht{background:#fdf1f1;color:var(--err);border-color:#f3c9cb;}
 .hist-meta{font-size:0.76rem;color:var(--ink-faint);margin-bottom:8px;}
 .hist-tipp{font-size:0.86rem;color:var(--ink-soft);border-left:2px solid var(--line);padding-left:12px;line-height:1.5;}
@@ -618,3 +634,30 @@ button,a,.niveau-btn,.teil-btn,.modus-tab,.ms-card{touch-action:manipulation;}
 
 /* Contexto visual para atividades enviadas pelo professor */
 .classroom-context{margin-top:6px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:10px;background:color-mix(in srgb,var(--accent) 8%,transparent);font-size:.82rem;color:var(--ink-soft);line-height:1.45}.classroom-context strong{display:block;color:var(--ink);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}.classroom-context span{display:block}.classroom-assignment-note{margin:0 0 14px;padding:12px 14px;border-radius:10px;background:color-mix(in srgb,var(--accent) 7%,transparent);border-left:3px solid var(--accent);color:var(--ink-soft);font-size:.86rem;line-height:1.5}
+
+/* ---------- Dark mode contrast hardening ---------- */
+:root[data-theme="dark"] .action-card:hover,
+:root[data-theme="dark"] .ms-card:hover,
+:root[data-theme="dark"] .teil-btn.active,
+:root[data-theme="dark"] .ms-card.selected,
+:root[data-theme="dark"] .auth-btn.google:hover{
+  color:var(--ink);
+}
+:root[data-theme="dark"] .teil-btn.active{border-color:var(--indigo);}
+:root[data-theme="dark"] .ms-card.selected{box-shadow:inset 2px 0 0 var(--indigo);}
+:root[data-theme="dark"] .big-cta.secondary:hover{background:var(--surface-soft);color:var(--ink);}
+:root[data-theme="dark"] .hist-badge.gut{background:var(--ok-soft);border-color:var(--ok-line);}
+:root[data-theme="dark"] .hist-badge.ok{background:var(--warn-soft);border-color:var(--warn-line);}
+:root[data-theme="dark"] .hist-badge.schlecht{background:var(--err-soft);border-color:var(--err-line);}
+:root[data-theme="dark"] .teacher-analytics-card{background:var(--surface-soft);}
+:root[data-theme="dark"] .stat-card,
+:root[data-theme="dark"] .progress-card,
+:root[data-theme="dark"] .learning-recommendation,
+:root[data-theme="dark"] .error-item{background:var(--card);}
+:root[data-theme="dark"] .mobile-bottom-nav a:hover{background:var(--surface-soft);}
+:root[data-theme="dark"] .onboarding-card{box-shadow:0 18px 50px rgba(0,0,0,.35);}
+
+/* Consistência de interação */
+button.primary,button.ghost,.auth-btn,.niveau-btn,.teil-btn,.modus-tab,.filter-btn,.pdf-export-btn,.fokus-btn{min-height:42px;}
+button.primary:active,button.ghost:active,.auth-btn:active,.niveau-btn:active,.teil-btn:active,.modus-tab:active,.filter-btn:active{transform:translateY(1px);}
+button.primary:focus-visible,.auth-btn:focus-visible,.niveau-btn:focus-visible,.teil-btn:focus-visible,.modus-tab:focus-visible,.filter-btn:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--indigo) 24%,transparent);}
