@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="pt-BR">
 <head>
 <script src="js/consent.js"></script>
 
@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <script src="js/theme.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Anmelden — Sprachio</title>
+<title>Entrar — Sprachio</title>
 <link rel="icon" href="assets/mark.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e1b4b">
@@ -24,11 +24,11 @@
     <a class="brand" href="/">
       <img src="assets/mark.png" alt="Sprachio" width="53" height="60">
       <span>
-        <span class="name">SPRACHIO</span><br><span class="sub">Deutsch lernen. Einfach besser.</span>
+        <span class="name">SPRACHIO</span><br><span class="sub">Aprenda alemão. Evolua sempre.</span>
       </span>
     </a>
     <div class="header-actions">
-      <a class="home-link" href="/trainer-hub">← Zurück</a>
+      <a class="home-link" href="/trainer-hub">← Voltar</a>
     </div>
   </div>
 </div>
@@ -38,25 +38,25 @@
     <div class="logo-row">
       <img src="assets/mark.png" alt="Sprachio" width="53" height="60">
     </div>
-    <div class="auth-title" id="authTitle">Willkommen bei Sprachio</div>
-    <div class="auth-sub" id="authSub">Dein Schreibverlauf wird automatisch gespeichert</div>
+    <div class="auth-title" id="authTitle">Bem-vindo ao Sprachio</div>
+    <div class="auth-sub" id="authSub">Seu histórico de estudos será salvo automaticamente</div>
 
     <div id="authChoice" style="display:flex;flex-direction:column;gap:14px;margin-top:28px;">
-      <button class="auth-btn" id="btnChooseRegister" style="min-height:58px;font-size:1.05rem;">REGISTRIEREN</button>
-      <button class="auth-btn" id="btnChooseLogin" style="min-height:58px;font-size:1.05rem;">LOG IN</button>
+      <button class="auth-btn" id="btnChooseRegister" style="min-height:58px;font-size:1.05rem;">CRIAR CONTA</button>
+      <button class="auth-btn" id="btnChooseLogin" style="min-height:58px;font-size:1.05rem;">ENTRAR</button>
     </div>
 
     <div id="authForm" style="display:none;">
     <button class="auth-btn google" id="btnGoogle">
       <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
-      Mit Google anmelden
+      Entrar com Google
     </button>
 
-    <div class="divider">oder</div>
+    <div class="divider">ou</div>
 
     <div class="form-group" id="nameGroup" style="display:none">
       <label>Name</label>
-      <input type="text" id="inputName" placeholder="Dein Name" autocomplete="name">
+      <input type="text" id="inputName" placeholder="Seu nome" autocomplete="name">
     </div>
     <div class="form-group">
       <label>E-Mail</label>
@@ -64,23 +64,23 @@
     </div>
     <div class="form-group">
       <label>Passwort</label>
-      <input type="password" id="inputPassword" placeholder="Mindestens 8 Zeichen" autocomplete="current-password">
+      <input type="password" id="inputPassword" placeholder="Mínimo de 8 caracteres" autocomplete="current-password">
     </div>
 
-    <button class="auth-btn" id="btnSubmit">Anmelden</button>
+    <button class="auth-btn" id="btnSubmit">Entrar</button>
     <div class="auth-msg" id="authMsg"></div>
 
     <div class="auth-toggle" id="forgotWrap">
-      <a id="forgotLink">Passwort vergessen?</a>
+      <a id="forgotLink">Esqueceu a senha?</a>
     </div>
 
     <div class="auth-toggle">
-      <span id="toggleText">Noch kein Konto?</span>
-      <a id="toggleLink">Registrieren</a>
+      <span id="toggleText">Ainda não tem uma conta?</span>
+      <a id="toggleLink">Criar conta</a>
     </div>
 
     <button id="backToChoice" type="button" style="display:flex;align-items:center;justify-content:center;width:100%;margin-top:18px;background:none;border:0;color:inherit;opacity:.72;cursor:pointer;font:inherit;">
-      ← Zurück
+      ← Voltar
     </button>
     </div>
   </div>
@@ -121,8 +121,8 @@ function showChoice(){
   modoEsqueci = false;
   authForm.style.display = 'none';
   authChoice.style.display = 'flex';
-  $('authTitle').textContent = 'Willkommen bei Sprachio';
-  $('authSub').textContent = 'Wähle, wie du beginnen möchtest.';
+  $('authTitle').textContent = 'Bem-vindo ao Sprachio';
+  $('authSub').textContent = 'Escolha como você quer começar.';
   $('authMsg').className = 'auth-msg';
   $('authMsg').textContent = '';
 }
@@ -139,7 +139,7 @@ function showMsg(txt, tipo='erro'){
 function setLoading(v){
   $('btnSubmit').disabled = v;
   $('btnGoogle').disabled = v;
-  $('btnSubmit').textContent = v ? 'Bitte warten…' : (modoEsqueci ? 'Link senden' : (modoRegistrar ? 'Registrieren' : 'Anmelden'));
+  $('btnSubmit').textContent = v ? 'Aguarde…' : (modoEsqueci ? 'Enviar link' : (modoRegistrar ? 'Criar conta' : 'Entrar'));
 }
 
 $('toggleLink').addEventListener('click', () => {
@@ -154,11 +154,11 @@ $('forgotLink').addEventListener('click', () => {
 });
 
 function atualizarUI(){
-  $('authTitle').textContent = modoEsqueci ? 'Passwort zurücksetzen' : (modoRegistrar ? 'Konto erstellen' : 'Willkommen bei Sprachio');
-  $('authSub').textContent = modoEsqueci ? 'Wir schicken dir einen Link zum Zurücksetzen.' : 'Dein Schreibverlauf wird automatisch gespeichert';
-  $('btnSubmit').textContent = modoEsqueci ? 'Link senden' : (modoRegistrar ? 'Registrieren' : 'Anmelden');
-  $('toggleText').textContent = modoRegistrar ? 'Schon ein Konto?' : 'Noch kein Konto?';
-  $('toggleLink').textContent = modoRegistrar ? 'Anmelden' : 'Registrieren';
+  $('authTitle').textContent = modoEsqueci ? 'Redefinir senha' : (modoRegistrar ? 'Criar sua conta' : 'Bem-vindo ao Sprachio');
+  $('authSub').textContent = modoEsqueci ? 'Enviaremos um link para redefinir sua senha.' : 'Seu histórico de estudos será salvo automaticamente';
+  $('btnSubmit').textContent = modoEsqueci ? 'Enviar link' : (modoRegistrar ? 'Criar conta' : 'Entrar');
+  $('toggleText').textContent = modoRegistrar ? 'Já tem uma conta?' : 'Ainda não tem uma conta?';
+  $('toggleLink').textContent = modoRegistrar ? 'Entrar' : 'Criar conta';
   $('authMsg').className = 'auth-msg';
 
   document.querySelector('#inputPassword').closest('.form-group').style.display = modoEsqueci ? 'none' : 'block';
@@ -166,7 +166,7 @@ function atualizarUI(){
   $('forgotWrap').style.display = modoRegistrar ? 'none' : 'flex';
   document.querySelector('.divider').style.display = modoEsqueci ? 'none' : 'flex';
   $('btnGoogle').style.display = modoEsqueci ? 'none' : 'flex';
-  $('forgotLink').textContent = modoEsqueci ? '← Zurück zum Login' : 'Passwort vergessen?';
+  $('forgotLink').textContent = modoEsqueci ? '← Voltar zum Login' : 'Esqueceu a senha?';
 }
 
 $('btnSubmit').addEventListener('click', async () => {
@@ -175,23 +175,23 @@ $('btnSubmit').addEventListener('click', async () => {
   const password = $('inputPassword').value;
 
   if (modoEsqueci) {
-    if (!email) { showMsg('Bitte E-Mail eingeben.'); return; }
+    if (!email) { showMsg('Digite seu e-mail.'); return; }
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: location.origin + '/reset-password'
       });
       if (error) throw error;
-      showMsg('E-Mail zum Zurücksetzen gesendet! Bitte Postfach prüfen.', 'ok');
+      showMsg('E-mail de redefinição enviado! Verifique sua caixa de entrada.', 'ok');
     } catch(e) {
-      showMsg(e.message || 'Fehler beim Senden.');
+      showMsg(e.message || 'Erro ao enviar.');
     }
     setLoading(false);
     return;
   }
 
-  if (modoRegistrar && !name) { showMsg('Bitte Namen eingeben.'); return; }
-  if (!email || !password) { showMsg('Bitte E-Mail und Passwort eingeben.'); return; }\n  if (password.length < 8) { showMsg('Das Passwort muss mindestens 8 Zeichen enthalten.'); return; }
+  if (modoRegistrar && !name) { showMsg('Digite seu nome.'); return; }
+  if (!email || !password) { showMsg('Digite seu e-mail e sua senha.'); return; }\n  if (password.length < 8) { showMsg('A senha deve ter pelo menos 8 caracteres.'); return; }
   setLoading(true);
   try {
     let result;
@@ -208,12 +208,12 @@ $('btnSubmit').addEventListener('click', async () => {
     }
     if (result.error) throw result.error;
     if (modoRegistrar && !result.data.session) {
-      showMsg('Konto erstellt. Du kannst dich jetzt anmelden.', 'ok');
+      showMsg('Conta criada. Agora você pode entrar.', 'ok');
     } else {
       location.href = '/trainer-hub';
     }
   } catch(e) {
-    showMsg(e.message || 'Fehler beim Anmelden.');
+    showMsg(e.message || 'Fehler beim Entrar.');
   }
   setLoading(false);
 });
