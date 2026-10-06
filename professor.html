@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="pt-BR">
 <head>
 <script src="js/consent.js"></script>
 
@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <script src="js/theme.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lehrer-Modus — Sprachio</title>
+<title>Área do professor — Sprachio</title>
 <link rel="icon" href="assets/mark.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e1b4b">
@@ -74,15 +74,15 @@
     </a>
     <div class="header-actions">
       <span id="userEmail" style="font-size:0.8rem;color:var(--ink-faint);"></span>
-      <a class="home-link" href="/trainer-hub">← Hub</a>
+      <a class="home-link" href="/trainer-hub">← Início</a>
     </div>
   </div>
 
   <div id="app">
-    <div class="hist-loading">Laden&hellip;</div>
+    <div class="hist-loading">Carregando&hellip;</div>
   </div>
 
-  <div class="disclaimer">Lehrer-Modus — sieh den Fortschritt deiner Klasse und teile Aufgaben.</div>
+  <div class="disclaimer">Área do professor — acompanhe o progresso das suas turmas e envie atividades.</div>
 </div>
 
 <script src="js/config.js"></script>
@@ -139,7 +139,7 @@ async function init(){
   if (!ehProfessor) {
     $('app').innerHTML = `<div class="no-access">
       <div style="font-size:2.4rem;margin-bottom:14px;">🔒</div>
-      <p>Diese Seite ist für Lehrkräfte reserviert.<br>Falls du Lehrer/in bist und Zugang brauchst, bitte den Admin, dich freizuschalten.</p>
+      <p>Esta página é exclusiva para professores.<br>Se você é professor e precisa de acesso, peça ao administrador para liberar sua conta.</p>
     </div>`;
     return;
   }
@@ -177,7 +177,7 @@ async function carregarAnalyticaProfessor(){
       const r=await sbFetch('turma_membros?turma_id=eq.'+encodeURIComponent(t.id)+'&select=user_id');
       const ms=await r.json(); if(Array.isArray(ms)) ms.forEach(m=>{if(m.user_id&&!ids.includes(m.user_id))ids.push(m.user_id);});
     }
-    if(!ids.length){grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Noch keine Schülerdaten.</div>';return;}
+    if(!ids.length){grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Noch keine alunosdaten.</div>';return;}
     const inIds=ids.map(id=>'"'+id+'"').join(',');
     const [rh,re]=await Promise.all([
       sbFetch('historico?user_id=in.('+inIds+')&select=user_id,nivel_atingido,status,created_at'),
@@ -188,50 +188,50 @@ async function carregarAnalyticaProfessor(){
     const active30=new Set(h.filter(x=>Date.now()-new Date(x.created_at).getTime()<=30*86400000).map(x=>x.user_id)).size;
     const reached=h.filter(x=>['erreicht','übertroffen'].includes(x.status)||String(x.nivel_atingido||'').includes('erreicht')).length;
     grid.innerHTML=[
-      [ids.length,'Schüler/innen'],[h.length,'Korrekturen'],[active30,'Aktiv in 30 Tagen'],[reached,'Erfolgreiche Ergebnisse'],[e.length,'Erfasste Fehler']
+      [ids.length,'Alunos'],[h.length,'Correções'],[active30,'Ativos nos últimos 30 dias'],[reached,'Resultados alcançados'],[e.length,'Erros identificados']
     ].map(x=>'<div class="teacher-analytics-card"><div class="v">'+escapeHtml(String(x[0]))+'</div><div class="l">'+escapeHtml(x[1])+'</div></div>').join('');
     const counts=new Map();e.forEach(x=>{const k=x.subcategoria||'Grammatik';counts.set(k,(counts.get(k)||0)+1);});
     const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3);
-    focus.innerHTML=top.length?'Häufigste Lernfelder: <strong>'+top.map(x=>escapeHtml(x[0])+' ('+x[1]+'×)').join(' · ')+'</strong>':'Noch keine Fehlerdaten vorhanden.';
-  }catch(err){console.error('Klassenanalyse:',err);grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Analyse konnte nicht geladen werden.</div>';}
+    focus.innerHTML=top.length?'Principais áreas de estudo: <strong>'+top.map(x=>escapeHtml(x[0])+' ('+x[1]+'×)').join(' · ')+'</strong>':'Ainda não há dados de erros.';
+  }catch(err){console.error('Análise das turmas:',err);grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Analyse konnte nicht geladen werden.</div>';}
 }
 
 function renderHome(){
   turmaAtual = null;
   $('app').innerHTML = `
-    <h2 class="screen-title" style="margin-bottom:6px;">Lehrer-Modus</h2>
-    <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 24px;">Erstelle Klassen, teile den Beitrittscode und sieh den Fortschritt deiner Schüler.</p>
+    <h2 class="screen-title" style="margin-bottom:6px;">Área do professor</h2>
+    <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 24px;">Crie turmas, compartilhe o código de acesso e acompanhe o progresso dos seus alunos.</p>
 
     <div class="form-inline">
-      <input type="text" id="inputNomeTurma" placeholder="Name der Klasse (z.B. 9A Deutsch)">
-      <button class="primary" id="btnCriarTurma">+ Klasse erstellen</button>
+      <input type="text" id="inputNomeTurma" placeholder="Nome da turma (ex.: 9A Alemão)">
+      <button class="primary" id="btnCriarTurma">+ Criar turma</button>
     </div>
 
     <div class="teacher-summary">
-      <div class="teacher-summary-card"><div class="value">${turmas.length}</div><div class="label">Klassen</div></div>
-      <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._count||0),0)}</div><div class="label">Schüler/innen</div></div>
-      <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._aufgaben||0),0)}</div><div class="label">Geteilte Aufgaben</div></div>
+      <div class="teacher-summary-card"><div class="value">${turmas.length}</div><div class="label">Turman</div></div>
+      <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._count||0),0)}</div><div class="label">Alunos</div></div>
+      <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._aufgaben||0),0)}</div><div class="label">Atividades enviadas</div></div>
     </div>
 
     <div class="teacher-analytics" id="teacherAnalytics">
-      <strong>Klassenanalyse</strong>
-      <div class="teacher-analytics-grid" id="teacherAnalyticsGrid"><div style="color:var(--ink-faint);font-size:.8rem;">Wird berechnet…</div></div>
+      <strong>Análise das turmas</strong>
+      <div class="teacher-analytics-grid" id="teacherAnalyticsGrid"><div style="color:var(--ink-faint);font-size:.8rem;">Calculando…</div></div>
       <div id="teacherAnalyticsFocus" style="margin-top:12px;font-size:.82rem;color:var(--ink-soft);"></div>
     </div>
 
-    <div class="section-label">Deine Klassen</div>
+    <div class="section-label">Suas turmas</div>
     <div class="turma-grid" id="turmaGrid"></div>
   `;
 
   const grid = $('turmaGrid');
   if (!turmas.length) {
-    grid.innerHTML = `<div class="ms-empty" style="padding:20px;">Noch keine Klasse erstellt.</div>`;
+    grid.innerHTML = `<div class="ms-empty" style="padding:20px;">Nenhuma turma criada ainda.</div>`;
   } else {
     grid.innerHTML = turmas.map(t => `
       <div class="turma-card" data-id="${t.id}">
         <div class="nome">${escapeHtml(t.nome)}</div>
-        <div class="codigo">Code: ${escapeHtml(t.codigo)}</div>
-        <div class="count">${t._count} Schüler</div>
+        <div class="codigo">Código: ${escapeHtml(t.codigo)}</div>
+        <div class="count">${t._count} alunos</div>
       </div>`).join('');
     grid.querySelectorAll('.turma-card').forEach(card => {
       card.addEventListener('click', () => abrirTurma(card.dataset.id));
@@ -257,7 +257,7 @@ async function criarTurma(){
     await carregarTurmas();
     renderHome();
   } catch(e) {
-    alert('Fehler beim Erstellen der Klasse.');
+    alert('Não foi possível criar a turma.');
   }
 }
 
@@ -265,7 +265,7 @@ async function abrirTurma(turmaId){
   turmaAtual = turmas.find(t => t.id === turmaId);
   if (!turmaAtual) return;
 
-  $('app').innerHTML = `<div class="hist-loading">Laden&hellip;</div>`;
+  $('app').innerHTML = `<div class="hist-loading">Carregando&hellip;</div>`;
 
   // Membros
   const resM = await sbFetch(`turma_membros?turma_id=eq.${turmaId}&select=user_id,joined_at`);
@@ -289,7 +289,7 @@ async function abrirTurma(turmaId){
     if (!Array.isArray(historicoTodos)) historicoTodos = [];
   }
 
-  // Aufgaben da turma
+  // Atividades da turma
   const resA = await sbFetch(`aufgabas_turma?turma_id=eq.${turmaId}&select=*&order=created_at.desc`);
   const aufgabenTurma = await resA.json();
 
@@ -304,27 +304,27 @@ async function abrirTurma(turmaId){
     const entregasAluno = Array.isArray(entregasTurma) ? entregasTurma.filter(e => e.aluno_id === m.user_id) : [];
     const ultimaEntrega = entregasAluno[0]?.enviado_em ? new Date(entregasAluno[0].enviado_em) : null;
     const ultimaData = ultimaEntrega || (registros[0]?.created_at ? new Date(registros[0].created_at) : null);
-    return { user_id: m.user_id, nome: perfil?.nome || 'Schüler', melhor, count: entregasAluno.length, historicoCount: registros.length, ultima: ultimaData ? ultimaData.toLocaleDateString('de-DE') : '—' };
+    return { user_id: m.user_id, nome: perfil?.nome || 'alunos', melhor, count: entregasAluno.length, historicoCount: registros.length, ultima: ultimaData ? ultimaData.toLocaleDateString('de-DE') : '—' };
   });
 
   $('app').innerHTML = `
-    <button class="ghost" id="btnVoltar" style="margin-bottom:18px;">← Alle Klassen</button>
+    <button class="ghost" id="btnVoltar" style="margin-bottom:18px;">← Alle Turman</button>
     <h2 class="screen-title" style="margin-bottom:14px;">${escapeHtml(turmaAtual.nome)}</h2>
 
     <div class="codigo-box" id="codigoBox">${escapeHtml(turmaAtual.codigo)}<small>Beitrittscode — antippen zum Kopieren</small></div>
 
-    <div class="section-label">Schüler (${alunosStats.length})</div>
+    <div class="section-label">alunos (${alunosStats.length})</div>
     <div id="alunosList" style="margin-bottom:32px;"></div>
 
-    <div class="section-label">Aufgabe für die Klasse teilen</div>
+    <div class="section-label">Atividade für die Turma teilen</div>
     <div class="niveau-row" id="niveauRowTurma"></div>
     <textarea class="big" id="aufgabeTurmaInput" placeholder="z.B. 'Schreibe einen Beitrag zum Thema Freundschaft…'" style="width:100%;min-height:100px;border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;font-family:inherit;font-size:0.94rem;margin:10px 0;"></textarea>
-    <button class="primary" id="btnPostarAufgabe">Aufgabe teilen</button>
+    <button class="primary" id="btnPostarAtividade">Atividade teilen</button>
 
-    <div class="section-label" style="margin-top:28px;">Geteilte Aufgaben</div>
+    <div class="section-label" style="margin-top:28px;">Atividades enviadas</div>
     <div id="aufgabenList"></div>
 
-    <div class="section-label" style="margin-top:28px;">Schülerabgaben</div>
+    <div class="section-label" style="margin-top:28px;">alunosabgaben</div>
     <div id="entregasList"></div>
   `;
 
@@ -337,19 +337,19 @@ async function abrirTurma(turmaId){
 
   const alunosEl = $('alunosList');
   if (!alunosStats.length) {
-    alunosEl.innerHTML = `<div class="ms-empty">Noch keine Schüler. Teile den Code oben, damit sie beitreten können.</div>`;
+    alunosEl.innerHTML = `<div class="ms-empty">Noch keine alunos. Teile den Code oben, damit sie beitreten können.</div>`;
   } else {
     alunosEl.innerHTML = alunosStats.map(a => `
       <div>
         <div class="aluno-row">
           <div>
             <div class="email">${escapeHtml(a.nome)}</div>
-            <div class="stats">${a.count} abgegebene Aufgaben · letzte: ${a.ultima}${a.historicoCount ? ` · ${a.historicoCount} freie Übungen` : ''}</div>
+            <div class="stats">${a.count} abgegebene Atividades · letzte: ${a.ultima}${a.historicoCount ? ` · ${a.historicoCount} freie Übungen` : ''}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <span class="badge">${escapeHtml(a.melhor)}</span>
-            <button class="btn-sair" data-verlauf="${a.user_id}" style="font-family:inherit;font-size:0.74rem;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;">Verlauf</button>
-            <button class="btn-sair" data-reset-senha="${a.user_id}" style="font-family:inherit;font-size:0.74rem;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;">Passwort zurücksetzen</button>
+            <button class="btn-sair" data-verlauf="${a.user_id}" style="font-family:inherit;font-size:0.74rem;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;">Histórico</button>
+            <button class="btn-sair" data-reset-senha="${a.user_id}" style="font-family:inherit;font-size:0.74rem;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;">Redefinir senha</button>
             <button class="btn-sair" data-remover="${a.user_id}" style="font-family:inherit;font-size:0.74rem;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;">Entfernen</button>
           </div>
         </div>
@@ -365,7 +365,7 @@ async function abrirTurma(turmaId){
         if (abrindo && !wrap.dataset.loaded) {
           const registros = historicoTodos.filter(h => h.user_id === uid);
           let entregasAluno = Array.isArray(entregasTurma) ? entregasTurma.filter(e => e.aluno_id === uid) : [];
-          // Recarrega as entregas diretamente do banco ao abrir o Verlauf.
+          // Recarrega as entregas diretamente do banco ao abrir o Histórico.
           // Assim, uma entrega feita depois do carregamento da turma aparece imediatamente.
           try {
             const resAlunoEntregas = await sbFetch(
@@ -375,19 +375,19 @@ async function abrirTurma(turmaId){
               const dadosAlunoEntregas = await resAlunoEntregas.json();
               if (Array.isArray(dadosAlunoEntregas)) entregasAluno = dadosAlunoEntregas;
             } else {
-              console.error('Fehler beim Laden der Schülerabgaben:', resAlunoEntregas.status, await resAlunoEntregas.text());
+              console.error('Erro beim Laden der alunosabgaben:', resAlunoEntregas.status, await resAlunoEntregas.text());
             }
           } catch (err) {
-            console.error('Fehler beim Laden der Schülerabgaben:', err);
+            console.error('Erro beim Laden der alunosabgaben:', err);
           }
 
           const aufgabenMap = new Map((Array.isArray(aufgabenTurma) ? aufgabenTurma : []).map(a => [a.id, a]));
           wrap.dataset.loaded = '1';
           const entregasHtml = entregasAluno.map(e => {
             const aufgabe = aufgabenMap.get(e.tarefa_id);
-            const statusLabel = { enviada:'Abgegeben · wartet auf Korrektur', em_correcao_ia:'KI korrigiert…', corrigida_ia:'Mit KI korrigiert', corrigida_professora:'Von Lehrkraft korrigiert', recusada:'Nicht korrigiert' }[e.status] || e.status;
+            const statusLabel = { enviada:'Entregue · wartet auf Correção', em_correcao_ia:'KI korrigiert…', corrigida_ia:'Mit KI korrigiert', corrigida_professora:'Von Professor korrigiert', recusada:'Nicht korrigiert' }[e.status] || e.status;
             return `<div class="hist-card" style="margin-bottom:8px;">
-              <div class="hist-top"><span class="hist-thema">${escapeHtml(aufgabe?.aufgabenstellung || 'Aufgabe')}</span><span class="hist-badge">${escapeHtml(statusLabel)}</span></div>
+              <div class="hist-top"><span class="hist-thema">${escapeHtml(aufgabe?.aufgabenstellung || 'Atividade')}</span><span class="hist-badge">${escapeHtml(statusLabel)}</span></div>
               <div class="hist-meta">${aufgabe?.niveau ? niveauLabel(aufgabe.niveau) + ' · ' : ''}${e.enviado_em ? new Date(e.enviado_em).toLocaleDateString('de-DE') : ''}</div>
               <div class="quelltext" style="margin-top:8px;white-space:pre-wrap;">${escapeHtml(e.texto || '')}</div>
             </div>`;
@@ -399,23 +399,23 @@ async function abrirTurma(turmaId){
               ${r.texto_aluno ? `<div class="quelltext" style="margin-top:8px;">${escapeHtml(r.texto_aluno)}</div>` : ''}
               ${r.tipp ? `<div class="hist-tipp">→ ${escapeHtml(r.tipp)}</div>` : ''}
             </div>`).join('');
-          wrap.innerHTML = `<div style="font-size:0.76rem;font-weight:700;color:var(--ink-faint);margin:8px 0;">Abgegebene Klassenaufgaben</div>${entregasHtml || '<div class="ms-empty">Keine Klassenaufgaben abgegeben.</div>'}<div style="font-size:0.76rem;font-weight:700;color:var(--ink-faint);margin:14px 0 8px;">Freie Übungen</div>${historicoHtml || '<div class="ms-empty">Keine freien Übungen.</div>'}`;        }
+          wrap.innerHTML = `<div style="font-size:0.76rem;font-weight:700;color:var(--ink-faint);margin:8px 0;">Entreguee Turmanaufgaben</div>${entregasHtml || '<div class="ms-empty">Keine Turmanaufgaben abgegeben.</div>'}<div style="font-size:0.76rem;font-weight:700;color:var(--ink-faint);margin:14px 0 8px;">Freie Übungen</div>${historicoHtml || '<div class="ms-empty">Keine freien Übungen.</div>'}`;        }
       });
     });
 
     alunosEl.querySelectorAll('[data-reset-senha]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const uid = btn.dataset.resetSenha;
-        const senha = prompt('Neues Passwort für diesen Schüler eingeben (mindestens 8 Zeichen):');
+        const senha = prompt('Neues Senha für diesen alunos eingeben (mindestens 8 Zeichen):');
         if (senha === null) return;
         if (senha.length < 8) {
-          alert('Das Passwort muss mindestens 8 Zeichen lang sein.');
+          alert('Das Senha muss mindestens 8 Zeichen lang sein.');
           return;
         }
 
         btn.disabled = true;
         const textoOriginal = btn.textContent;
-        btn.textContent = 'Speichern…';
+        btn.textContent = 'Salvar…';
 
         try {
           const { data, error } = await supabase.functions.invoke('admin-reset-user-password', {
@@ -426,7 +426,7 @@ async function abrirTurma(turmaId){
           });
 
           if (error) {
-            let detail = error.message || 'Unbekannter Fehler';
+            let detail = error.message || 'Unbekannter Erro';
             try {
               if (error.context) {
                 const payload = await error.context.json();
@@ -436,12 +436,12 @@ async function abrirTurma(turmaId){
             throw new Error(detail);
           }
 
-          if (!data?.ok) throw new Error(data?.error || 'Passwort konnte nicht zurückgesetzt werden.');
+          if (!data?.ok) throw new Error(data?.error || 'Senha konnte nicht zurückgesetzt werden.');
 
-          alert('Passwort erfolgreich zurückgesetzt.');
+          alert('Senha erfolgreich zurückgesetzt.');
         } catch (e) {
-          console.error('Passwort zurücksetzen:', e);
-          alert('Passwort konnte nicht zurückgesetzt werden: ' + (e.message || e));
+          console.error('Redefinir senha:', e);
+          alert('Senha konnte nicht zurückgesetzt werden: ' + (e.message || e));
         } finally {
           btn.disabled = false;
           btn.textContent = textoOriginal;
@@ -451,7 +451,7 @@ async function abrirTurma(turmaId){
 
     alunosEl.querySelectorAll('[data-remover]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        if (!confirm('Diesen Schüler wirklich aus der Klasse entfernen?')) return;
+        if (!confirm('Diesen alunos wirklich aus der Turma entfernen?')) return;
         await sbFetch(`turma_membros?turma_id=eq.${turmaId}&user_id=eq.${btn.dataset.remover}`, { method:'DELETE' });
         abrirTurma(turmaId);
       });
@@ -470,7 +470,7 @@ async function abrirTurma(turmaId){
     });
   });
 
-  $('btnPostarAufgabe').addEventListener('click', async () => {
+  $('btnPostarAtividade').addEventListener('click', async () => {
     const texto = $('aufgabeTurmaInput').value.trim();
     if (!texto) return;
     try {
@@ -481,12 +481,12 @@ async function abrirTurma(turmaId){
       });
       $('aufgabeTurmaInput').value = '';
       abrirTurma(turmaId); // recarrega
-    } catch(e) { alert('Fehler beim Teilen der Aufgabe.'); }
+    } catch(e) { alert('Erro beim Teilen der Atividade.'); }
   });
 
   const aufgabenEl = $('aufgabenList');
   if (!Array.isArray(aufgabenTurma) || !aufgabenTurma.length) {
-    aufgabenEl.innerHTML = `<div class="ms-empty">Noch keine Aufgabe geteilt.</div>`;
+    aufgabenEl.innerHTML = `<div class="ms-empty">Noch keine Atividade geteilt.</div>`;
   } else {
     aufgabenEl.innerHTML = aufgabenTurma.map(a => `
       <div class="aufgaben-list-item" style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
@@ -494,41 +494,41 @@ async function abrirTurma(turmaId){
           <div class="meta">${niveauLabel(a.niveau)} · ${new Date(a.created_at).toLocaleDateString('de-DE')}</div>
           ${escapeHtml(a.aufgabenstellung)}
         </div>
-        <button data-del-aufgabe="${a.id}" style="flex-shrink:0;font-family:inherit;font-size:0.72rem;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-faint);cursor:pointer;">Löschen</button>
+        <button data-del-aufgabe="${a.id}" style="flex-shrink:0;font-family:inherit;font-size:0.72rem;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink-faint);cursor:pointer;">Excluir</button>
       </div>`).join('');
 
     aufgabenEl.querySelectorAll('[data-del-aufgabe]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        if (!confirm('Diese Aufgabe wirklich löschen?')) return;
-        await sbFetch(`aufgabas_turma?id=eq.${btn.dataset.delAufgabe}`, { method:'DELETE' });
+        if (!confirm('Diese Atividade wirklich löschen?')) return;
+        await sbFetch(`aufgabas_turma?id=eq.${btn.dataset.delAtividade}`, { method:'DELETE' });
         abrirTurma(turmaId);
       });
     });
   }
 
-  const nomePorId = new Map(perfis.map(p => [p.user_id, p.nome || 'Schüler']));
+  const nomePorId = new Map(perfis.map(p => [p.user_id, p.nome || 'alunos']));
 
   const entregasEl = $('entregasList');
   if (!Array.isArray(entregasTurma) || !entregasTurma.length) {
-    entregasEl.innerHTML = '<div class="ms-empty">Noch keine Schülerabgaben.</div>';
+    entregasEl.innerHTML = '<div class="ms-empty">Noch keine alunosabgaben.</div>';
   } else {
     entregasEl.innerHTML = entregasTurma.map(e => {
       const aufgabe = Array.isArray(aufgabenTurma) ? aufgabenTurma.find(a => a.id === e.tarefa_id) : null;
       const statusLabel = {
-        enviada: 'Wartet auf Korrektur',
+        enviada: 'Wartet auf Correção',
         em_correcao_ia: 'KI korrigiert…',
         corrigida_ia: 'Mit KI korrigiert',
-        corrigida_professora: 'Von Lehrkraft korrigiert',
+        corrigida_professora: 'Von Professor korrigiert',
         recusada: 'Nicht korrigiert'
       }[e.status] || e.status;
       const feedback = e.feedback || {};
       return `
         <div class="aufgaben-list-item" data-entrega-card="${e.id}">
-          <div class="meta">${escapeHtml(nomePorId.get(e.aluno_id) || e.aluno_email || 'Schüler')} · ${e.enviado_em ? new Date(e.enviado_em).toLocaleString('de-DE') : ''} · ${escapeHtml(statusLabel)}</div>
-          <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:8px;">Aufgabe: ${escapeHtml(aufgabe?.aufgabenstellung || e.tarefa_id)}</div>
+          <div class="meta">${escapeHtml(nomePorId.get(e.aluno_id) || e.aluno_email || 'alunos')} · ${e.enviado_em ? new Date(e.enviado_em).toLocaleString('de-DE') : ''} · ${escapeHtml(statusLabel)}</div>
+          <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:8px;">Atividade: ${escapeHtml(aufgabe?.aufgabenstellung || e.tarefa_id)}</div>
           <div style="white-space:pre-wrap;line-height:1.65;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;font-size:0.92rem;">${escapeHtml(e.texto)}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-            ${e.status === 'enviada' ? `<button class="primary" data-ia-entrega="${e.id}">Korrektur mit KI</button>` : ''}
+            ${e.status === 'enviada' ? `<button class="primary" data-ia-entrega="${e.id}">Correção mit KI</button>` : ''}
             <button class="ghost" data-toggle-feedback="${e.id}">${e.feedback ? 'Feedback anzeigen' : 'Nur ansehen'}</button>
           </div>
           <div id="feedback-entrega-${e.id}" style="display:none;margin-top:12px;"></div>
@@ -544,12 +544,12 @@ async function abrirTurma(turmaId){
         wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
         if (wrap.style.display === 'block') {
           if (!entrega?.feedback) {
-            wrap.innerHTML = '<div style="font-size:0.84rem;color:var(--ink-soft);">Noch keine KI-Korrektur. Die Entscheidung liegt bei dir.</div>';
+            wrap.innerHTML = '<div style="font-size:0.84rem;color:var(--ink-soft);">Noch keine KI-Correção. Die Entscheidung liegt bei dir.</div>';
           } else {
             const fb = entrega.feedback;
             wrap.innerHTML = `
               <div class="hist-card">
-                <strong>${escapeHtml(fb.niveau_einschaetzung || fb.status || 'Korrektur')}</strong>
+                <strong>${escapeHtml(fb.niveau_einschaetzung || fb.status || 'Correção')}</strong>
                 <p>${escapeHtml(fb.erfuellung || '')}</p>
                 <p>${escapeHtml(fb.aufbau || '')}</p>
                 <p>${escapeHtml(fb.sprache || '')}</p>
@@ -569,17 +569,17 @@ async function abrirTurma(turmaId){
         btn.textContent = 'KI korrigiert…';
         try {
           const aufgabe = Array.isArray(aufgabenTurma) ? aufgabenTurma.find(a => a.id === entrega.tarefa_id) : null;
-          const prompt = `Du bist eine erfahrene Deutschlehrkraft. Korrigiere den folgenden Schülertext zu dieser von der Lehrkraft gestellten Aufgabe.
+          const prompt = `Du bist eine erfahrene Deutschlehrkraft. Korrigiere den folgenden alunostext zu dieser von der Professor gestellten Atividade.
 Niveau: ${aufgabe?.niveau || 'B1'}
-Aufgabe:
+Atividade:
 ${aufgabe?.aufgabenstellung || ''}
 
-Schülertext:
+alunostext:
 """
 ${entrega.texto}
 """
 
-Bewerte kurz Aufgabenerfüllung, Aufbau sowie Sprache/Grammatik und nenne maximal 6 konkrete Korrekturen.
+Bewerte kurz Atividadeserfüllung, Aufbau sowie Sprache/Grammatik und nenne maximal 6 konkrete Correções.
 Antworte ausschließlich als JSON:
 {"niveau_einschaetzung":"...","status":"erreicht|knapp erreicht|noch nicht erreicht","erfuellung":"...","aufbau":"...","sprache":"...","korrekturen":[{"original":"...","korrektur":"...","erklaerung":"..."}],"tipp":"..." }`;
           await sbFetch(`entregas_turma?id=eq.${encodeURIComponent(entrega.id)}`, {
@@ -593,7 +593,7 @@ Antworte ausschließlich als JSON:
             body:JSON.stringify({prompt,max_tokens:5000})
           });
           const data = await response.json();
-          if (!response.ok || data.error) throw new Error(data.error || 'KI-Fehler');
+          if (!response.ok || data.error) throw new Error(data.error || 'KI-Erro');
           let raw = String(data.text || '').trim().replace(/^\`\`\`json\s*/,'').replace(/^\`\`\`\s*/,'').replace(/\s*\`\`\`$/,'');
           const feedback = JSON.parse(raw);
           const update = await sbFetch(`entregas_turma?id=eq.${encodeURIComponent(entrega.id)}`, {
@@ -610,9 +610,9 @@ Antworte ausschließlich als JSON:
             headers:{Prefer:'return=minimal'},
             body:JSON.stringify({status:'enviada'})
           });
-          alert('Die KI-Korrektur konnte nicht durchgeführt werden. Der Text bleibt zur manuellen Entscheidung offen.');
+          alert('Die KI-Correção konnte nicht durchgeführt werden. Der Text bleibt zur manuellen Entscheidung offen.');
           btn.disabled = false;
-          btn.textContent = 'Korrektur mit KI';
+          btn.textContent = 'Correção mit KI';
         }
       });
     });
