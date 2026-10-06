@@ -624,7 +624,10 @@ function carregarModellsatzReal(item){
   }
   $('btnToSchreiben').disabled = false;
 }
-if ($('btnBackToConfig')) $('btnBackToConfig').addEventListener('click', () => goToPage('config'));
+if ($('btnBackToConfig')) $('btnBackToConfig').addEventListener('click', () => {
+  if (state.classroomSubmission) return;
+  goToPage('config');
+});
 if ($('btnToSchreiben')) $('btnToSchreiben').addEventListener('click', () => {
   aufgabeVisivel = true;
   renderAufgabeInline();
@@ -803,6 +806,17 @@ function retomarRascunhoNuvem(rascunho){
   state.aufgabaObj = rascunho.aufgaba_obj;
   state.classroomSubmission = !!rascunho.aufgaba_obj?.classroom;
 
+  const classroomContext = $('classroomContext');
+  if (classroomContext) {
+    if (state.classroomSubmission) {
+      const turma = rascunho.aufgaba_obj?.turma_nome || 'Sua turma';
+      classroomContext.innerHTML = '<strong>Atividade da sua turma</strong><span>' + escapeHtml(turma) + ' · ' + escapeHtml(niveauLabel(state.niveau)) + '</span>';
+      classroomContext.style.display = 'block';
+    } else {
+      classroomContext.style.display = 'none';
+    }
+  }
+
   renderNiveauRow();
   renderTeileRow();
   if ($('diffSlider')) { $('diffSlider').value = state.schwierigkeit; $('diffVal').textContent = state.schwierigkeit; }
@@ -818,6 +832,12 @@ function retomarRascunhoNuvem(rascunho){
   iniciarSalvamentoNuvemPeriodico();
 
   if ($('rascunhoNuvemBox')) $('rascunhoNuvemBox').style.display = 'none';
+  const freePracticeButton = $('btnGerarIA');
+  if (freePracticeButton) {
+    freePracticeButton.style.display = state.classroomSubmission ? 'none' : '';
+  }
+  const classNote = $('classroomContext');
+  if (classNote && state.classroomSubmission) classNote.style.display = 'block';
 }
 
 function updateWordCount(){
@@ -833,7 +853,7 @@ if ($('textInput')) $('textInput').addEventListener('input', () => {
 if ($('btnBackToAufgabe')) $('btnBackToAufgabe').addEventListener('click', () => { pararSalvamentoNuvemPeriodico(); goToPage('aufgabe'); });
 async function enviarEntregaTurma(text) {
   if (!_session?.user?.id || !state.aufgabaObj?.aufgabe_id || !state.aufgabaObj?.turma_id) {
-    throw new Error('Aufgabe der Klasse konnte nicht identifiziert werden.');
+    throw new Error('A atividade da turma não pôde ser identificada.');
   }
 
   const res = await sbFetch('entregas_turma', {
@@ -875,13 +895,13 @@ if ($('btnSenden')) $('btnSenden').addEventListener('click', async () => {
   if (state.classroomSubmission) {
     $('loadingResult').style.display = 'block';
     $('loadingResult').querySelector('.spin')?.remove();
-    $('loadingResult').innerHTML = '<div style="font-size:1.2rem;margin-bottom:8px;">✓</div><strong>Wird an die Lehrkraft gesendet…</strong>';
+    $('loadingResult').innerHTML = '<div style="font-size:1.2rem;margin-bottom:8px;">✓</div><strong>Enviando para o professor…</strong>';
     try {
       await enviarEntregaTurma(text);
       mostrarEntregaEnviada();
     } catch (e) {
       console.error(e);
-      $('loadingResult').innerHTML = '<div style="color:var(--err);">Die Abgabe konnte nicht gesendet werden. Bitte versuche es erneut.</div>';
+      $('loadingResult').innerHTML = '<div style="color:var(--err);">Não foi possível enviar a atividade. Tente novamente.</div>';
     }
     return;
   }
