@@ -6,8 +6,8 @@
 <meta charset="UTF-8">
 <script src="js/theme.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Praticar — Sprachio</title>
-<meta name="description" content="Wähle dein Niveau und übe Schreibaufgaben fürs Deutsche Sprachdiplom mit KI-Korrektur.">
+<title>Início — Sprachio</title>
+<meta name="description" content="Pratique alemão com exercícios personalizados e correção por IA.">
 <link rel="canonical" href="https://sprachio.hanst030.com/trainer-hub">
 <link rel="icon" href="assets/mark.png">
 <link rel="manifest" href="manifest.json">
@@ -60,6 +60,9 @@
 .tile.tile-primary .tile-title{color:#fff;}
 .tile.tile-primary .tile-desc{color:rgba(255,255,255,0.7);}
 .tile.tile-primary:hover{border-color:var(--indigo);}
+.primary-actions .tile{min-height:155px;display:flex;flex-direction:column;justify-content:flex-start;}
+.primary-actions .tile .tile-icon{font-size:2.15rem;}
+.secondary-practice{margin-top:-8px;}
 
 .tile-sm{
   display:block;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
@@ -172,18 +175,36 @@
   </div>
 
   <div class="hub-section">
-    <div class="hub-section-head"><span class="icon">🎯</span><h3>Praticar</h3></div>
-    <div class="tile-grid-lg">
+    <div class="hub-section-head"><span class="icon">✨</span><h3>O que você quer fazer?</h3></div>
+    <div class="tile-grid-lg primary-actions">
       <a class="tile tile-primary" href="/trainer#/config">
         <span class="tile-icon">🎯</span>
         <div class="tile-title">Praticar alemão</div>
-        <div class="tile-desc">Faça exercícios ou pratique com um simulado, de acordo com seu nível.</div>
+        <div class="tile-desc">Faça um exercício de acordo com seu nível.</div>
       </a>
-      <a class="tile" href="/freie-korrektur">
-        <span class="tile-icon">📸</span>
-        <div class="tile-title">Corrigir um texto</div>
-        <div class="tile-desc">Envie uma foto de um texto escrito à mão ou digite diretamente para receber uma correção.</div>
+      <a class="tile" href="#classAssignmentsSection">
+        <span class="tile-icon">📋</span>
+        <div class="tile-title">Minhas atividades</div>
+        <div class="tile-desc">Veja as atividades enviadas pelos seus professores.</div>
       </a>
+      <a class="tile" href="#personalProgressSection">
+        <span class="tile-icon">📈</span>
+        <div class="tile-title">Meu progresso</div>
+        <div class="tile-desc">Acompanhe sua evolução e descubra no que melhorar.</div>
+      </a>
+      <a class="tile" href="/vokabeln">
+        <span class="tile-icon">🗂️</span>
+        <div class="tile-title">Vocabulário</div>
+        <div class="tile-desc">Revise palavras e expressões importantes.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="hub-section secondary-practice">
+    <div class="hub-section-head"><span class="icon">✍️</span><h3>Outras formas de praticar</h3></div>
+    <div class="tile-grid-sm">
+      <a class="tile-sm" href="/freie-korrektur"><span class="tile-sm-icon">📸</span><div class="tile-sm-title">Corrigir um texto</div></a>
+      <a class="tile-sm" href="/trainer#/config"><span class="tile-sm-icon">📝</span><div class="tile-sm-title">Fazer um simulado</div></a>
     </div>
   </div>
 
@@ -198,27 +219,7 @@
     <div class="learning-focus" id="recommendationsList"></div>
   </div>
 
-  <div class="hub-section" data-nav-section="progresso">
-    <div class="hub-section-head"><span class="icon">📈</span><h3>Progresso</h3></div>
-    <div class="tile-grid-sm">
-      <a class="tile-sm" href="/historico">
-        <span class="tile-sm-icon">📊</span>
-        <div class="tile-sm-title">Meu histórico</div>
-      </a>
-      <a class="tile-sm" href="/vokabeln">
-        <span class="tile-sm-icon">🗂️</span>
-        <div class="tile-sm-title">Vocabulário</div>
-      </a>
-      <a class="tile-sm" href="/minhas-turmas">
-        <span class="tile-sm-icon">👥</span>
-        <div class="tile-sm-title">Minhas turmas</div>
-      </a>
-      <a class="tile-sm" id="teacherModeTile" href="/professor">
-        <span class="tile-sm-icon">🎓</span>
-        <div class="tile-sm-title">Área do professor</div>
-      </a>
-    </div>
-  </div>
+  <div class="hub-section secondary-links"><div class="hub-section-head"><span class="icon">⚙️</span><h3>Mais opções</h3></div><div class="tile-grid-sm"><a class="tile-sm" href="/historico"><span class="tile-sm-icon">📊</span><div class="tile-sm-title">Meu histórico</div></a><a class="tile-sm" href="/minhas-turmas"><span class="tile-sm-icon">👥</span><div class="tile-sm-title">Minhas turmas</div></a><a class="tile-sm" id="teacherModeTile" href="/professor"><span class="tile-sm-icon">🎓</span><div class="tile-sm-title">Área do professor</div></a></div></div>
 
   <div class="hub-section">
     <div class="hub-section-head"><span class="icon">🔑</span><h3>Entrar em uma turma</h3></div>
@@ -266,7 +267,7 @@
         <span class="name">SPRACHIO</span><br><span class="sub">Aprenda alemão. Evolua sempre.</span>
       </span>
     </a>
-    <small>Ferramenta de prática — não é uma avaliação oficial. · <a href="/datenschutz">Datenschutz</a> · <a href="/nutzungsbedingungen">Nutzungsbedingungen</a></small>
+    <small>Ferramenta de prática — não é uma avaliação oficial. · <a href="/datenschutz">Privacidade</a> · <a href="/nutzungsbedingungen">Termos de uso</a></small>
   </footer>
 </div>
 
@@ -279,7 +280,7 @@
       <li><b>🎯 Praticar alemão</b> — crie um exercício ou pratique com um simulado e receba uma correção da IA.</li>
       <li><b>📸 Corrigir um texto</b> — envie uma foto de um texto escrito à mão e receba uma correção.</li>
       <li><b>🗂️ Vocabulário</b> — revise palavras importantes a partir das suas correções.</li>
-      <li><b>🎓 Área do professor</b> — falls du unterrichtest: Klasse erstellen und den Progresso deiner Schüler/innen verfolgen.</li>
+      <li><b>🎓 Área do professor</b> — se você for professor, acesse a Área do professor para criar turmas e acompanhar seus alunos.</li>
     </ul>
     <button class="primary" id="btnOnboardingClose" style="width:100%;">Começar →</button>
   </div>
@@ -332,28 +333,28 @@ if (SUPABASE_URL) {
   const REC_RULES = {
     'Satzstellung': {
       title: 'Satzbau & Verbposition',
-      reason: 'Du hast wiederholt Fehler bei der Wort- und Verbposition gemacht.',
-      action: 'B1 · Satzbau üben'
+      reason: 'Você apresentou vários erros de posição das palavras e dos verbos.',
+      action: 'B1 · Praticar estrutura de frases'
     },
     'Verbformen': {
       title: 'Verbformen',
-      reason: 'Verbformen gehören zu deinen häufigsten correções.',
-      action: 'A2/B1 · Verben festigen'
+      reason: 'Formas verbais estão entre seus erros mais frequentes.',
+      action: 'A2/B1 · Praticar verbos'
     },
     'Kasus': {
       title: 'Kasus & Endungen',
-      reason: 'Dativ, Akkusativ oder Genitiv tauchen mehrfach in deinen correções auf.',
-      action: 'A2/B1 · Kasus üben'
+      reason: 'Dativo, acusativo ou genitivo aparecem várias vezes nas suas correções.',
+      action: 'A2/B1 · Praticar casos'
     },
     'Artikel': {
       title: 'Artikel & Genus',
-      reason: 'Bei Artikeln und Genus gibt es wiederkehrende Unsicherheiten.',
-      action: 'A2 · Artikel festigen'
+      reason: 'Há dúvidas recorrentes sobre artigos e gênero.',
+      action: 'A2 · Praticar artigos'
     },
     'Zeitform': {
       title: 'Zeitformen',
-      reason: 'Bei der Wahl oder Bildung von Zeitformen wurden mehrere Fehler gefunden.',
-      action: 'B1 · Zeitformen üben'
+      reason: 'Foram encontrados vários erros na escolha ou formação dos tempos verbais.',
+      action: 'B1 · Praticar tempos verbais'
     }
   };
 
@@ -428,7 +429,7 @@ if (SUPABASE_URL) {
         .map(([category,count]) => {
           const rule = REC_RULES[category] || {
             title: category,
-            reason: 'Dieser Bereich erscheint wiederholt in deinen correções.',
+            reason: 'Esta área aparece repetidamente nas suas correções.',
             action: 'Praticar este tema'
           };
           return {category,count,...rule};
@@ -454,7 +455,7 @@ if (SUPABASE_URL) {
     }
   }
 
-  async function carregarAufgabenTurmas(){
+  async function carregarAtividadenTurmas(){
     const section = document.getElementById('classAssignmentsSection');
     const list = document.getElementById('classAssignmentsList');
     if (!section || !list || !sessaoAtual) return;
@@ -465,7 +466,7 @@ if (SUPABASE_URL) {
       if (!Array.isArray(memberships) || !memberships.length) return;
 
       const turmaIds = [...new Set(memberships.map(m => m.turma_id).filter(Boolean))];
-      const turmaMap = Object.fromEntries(memberships.map(m => [m.turma_id, m.turmas?.nome || 'Klasse']));
+      const turmaMap = Object.fromEntries(memberships.map(m => [m.turma_id, m.turmas?.nome || 'Turma']));
       const inIds = turmaIds.map(id => '"' + id + '"').join(',');
       const ra = await sbFetch('aufgabas_turma?turma_id=in.(' + inIds + ')&select=id,turma_id,niveau,aufgabenstellung,created_at&order=created_at.desc&limit=12');
       if (!ra.ok) throw new Error('assignment lookup failed');
