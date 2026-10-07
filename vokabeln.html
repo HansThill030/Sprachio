@@ -76,18 +76,18 @@
     </div>
   </div>
 
-  <h2 class="screen-title" style="margin-bottom:6px;">Vokabeln</h2>
-  <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 24px;">Karten aus deinen Korrekturen — automatisch generiert, mit Wiederholung nach Bedarf.</p>
+  <h2 class="screen-title" style="margin-bottom:6px;">Vocabulário</h2>
+  <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 24px;">Cartões gerados automaticamente a partir das suas correções, com revisão espaçada.</p>
 
   <div class="vok-stats">
-    <div class="stat-card"><span class="stat-val" id="statFaellig">—</span><span class="stat-lbl">Heute fällig</span></div>
-    <div class="stat-card"><span class="stat-val" id="statGesamt">—</span><span class="stat-lbl">Karten gesamt</span></div>
-    <div class="stat-card"><span class="stat-val" id="statGelernt">—</span><span class="stat-lbl">Gut gelernt</span></div>
+    <div class="stat-card"><span class="stat-val" id="statFaellig">—</span><span class="stat-lbl">Para revisar hoje</span></div>
+    <div class="stat-card"><span class="stat-val" id="statGesamt">—</span><span class="stat-lbl">Total de cartões</span></div>
+    <div class="stat-card"><span class="stat-val" id="statGelernt">—</span><span class="stat-lbl">Bem aprendidos</span></div>
   </div>
 
   <div id="reviewArea"></div>
 
-  <div class="section-label" style="margin-top:36px;">Alle Karten</div>
+  <div class="section-label" style="margin-top:36px;">Todos os cartões</div>
   <div id="listArea"></div>
 
   <div class="disclaimer">Karten werden automatisch aus deinen Korrekturen erstellt.</div>
@@ -147,7 +147,7 @@ function renderStats(hoje){
 function renderReview(){
   const area = $('reviewArea');
   if (!filaRevisao.length) {
-    area.innerHTML = `<div class="vok-empty"><div class="big">✅</div>Keine Karten heute fällig.<br>Neue Karten entstehen automatisch bei jeder Korrektur.</div>`;
+    area.innerHTML = `<div class="vok-empty"><div class="big">✅</div>Nenhum cartão para revisar hoje.<br>Novos cartões são criados automaticamente após as correções.</div>`;
     return;
   }
   cartaAtual = filaRevisao[0];
@@ -211,7 +211,7 @@ async function avaliar(nivel){
 function renderList(){
   const area = $('listArea');
   if (!todasCartas.length) {
-    area.innerHTML = `<div class="vok-empty">Noch keine Vokabelkarten. Sie entstehen automatisch bei deinen Korrekturen.</div>`;
+    area.innerHTML = `<div class="vok-empty">Ainda não há cartões de vocabulário. Eles serão criados automaticamente após suas correções.</div>`;
     return;
   }
   area.innerHTML = todasCartas.map(c => `
