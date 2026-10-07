@@ -131,6 +131,9 @@ async function carregarTurmas(){
         const a = await sbFetch(`aufgabas_turma?turma_id=eq.${t.id}&select=id`);
         const tarefas = await a.json();
         t._aufgaben = Array.isArray(tarefas) ? tarefas.length : 0;
+        const e = await sbFetch(`entregas_turma?turma_id=eq.${t.id}&select=id`);
+        const entregas = await e.json();
+        t._entregas = Array.isArray(entregas) ? entregas.length : 0;
       } catch(e) { t._aufgaben = 0; }
     } catch(e) { t._count = 0; }
   }
@@ -146,7 +149,7 @@ async function carregarAnalyticaProfessor(){
       const r=await sbFetch('turma_membros?turma_id=eq.'+encodeURIComponent(t.id)+'&select=user_id');
       const ms=await r.json(); if(Array.isArray(ms)) ms.forEach(m=>{if(m.user_id&&!ids.includes(m.user_id))ids.push(m.user_id);});
     }
-    if(!ids.length){grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Noch keine alunosdaten.</div>';return;}
+    if(!ids.length){grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Ainda não há dados de alunos.</div>';return;}
     const inIds=ids.map(id=>'"'+id+'"').join(',');
     const [rh,re]=await Promise.all([
       sbFetch('historico?user_id=in.('+inIds+')&select=user_id,nivel_atingido,status,created_at'),
@@ -162,12 +165,12 @@ async function carregarAnalyticaProfessor(){
     const counts=new Map();e.forEach(x=>{const k=x.subcategoria||'Grammatik';counts.set(k,(counts.get(k)||0)+1);});
     const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3);
     focus.innerHTML=top.length?'Principais áreas de estudo: <strong>'+top.map(x=>escapeHtml(x[0])+' ('+x[1]+'×)').join(' · ')+'</strong>':'Ainda não há dados de erros.';
-  }catch(err){console.error('Análise das turmas:',err);grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Analyse konnte nicht geladen werden.</div>';}
+  }catch(err){console.error('Análise das turmas:',err);grid.innerHTML='<div style="color:var(--ink-faint);font-size:.8rem;">Não foi possível carregar a análise.</div>';}
 }
 
 function renderHome(){
   turmaAtual=null;
-  $('app').innerHTML='<div class="teacher-shell"><aside class="teacher-nav"><div class="teacher-nav-title">Área do professor</div><button class="active" data-nav="overview">Visão geral</button><button data-nav="classes">Minhas turmas</button><button data-nav="analytics">Análise</button><div class="sep"></div><button id="navCreate">+ Criar turma</button></aside><main class="teacher-content"><div class="teacher-head"><div><h2 class="screen-title">Visão geral</h2><p>Gerencie suas turmas e acompanhe o aprendizado dos alunos.</p></div><button class="primary" id="btnPrimaryAction">Criar atividade</button></div><div class="teacher-kpis"><div class="teacher-kpi"><div class="v">'+turmas.length+'</div><div class="l">Turmas</div></div><div class="teacher-kpi"><div class="v">'+turmas.reduce((n,t)=>n+(t._count||0),0)+'</div><div class="l">Alunos</div></div><div class="teacher-kpi"><div class="v">'+turmas.reduce((n,t)=>n+(t._aufgaben||0),0)+'</div><div class="l">Atividades</div></div><div class="teacher-kpi"><div class="v">—</div><div class="l">Entregas</div></div></div><section class="teacher-section" id="analyticsSection"><div class="teacher-section-head"><h3>Análise rápida</h3><span>Suas turmas</span></div><div class="analytics-grid" id="teacherAnalyticsGrid"><div style="color:var(--ink-faint);font-size:.8rem">Calculando…</div></div><div id="teacherAnalyticsFocus" style="margin-top:11px;font-size:.8rem;color:var(--ink-soft)"></div></section><section class="teacher-section" id="classesSection"><div class="teacher-section-head"><h3>Minhas turmas</h3><span>'+turmas.length+' turma(s)</span></div><div class="class-grid" id="turmaGrid"></div></section><section class="teacher-section" id="createSection" style="display:none"><div class="teacher-section-head"><h3>Criar nova turma</h3><span>Os alunos entrarão usando o código gerado.</span></div><div class="create-row"><input id="inputNomeTurma" placeholder="Nome da turma (ex.: 9A Alemão)"><button class="primary" id="btnCriarTurma">Criar turma</button></div></section></main></div>';
+  $('app').innerHTML='<div class="teacher-shell"><aside class="teacher-nav"><div class="teacher-nav-title">Área do professor</div><button class="active" data-nav="overview">Visão geral</button><button data-nav="classes">Minhas turmas</button><button data-nav="analytics">Análise</button><div class="sep"></div><button id="navCreate">+ Criar turma</button></aside><main class="teacher-content"><div class="teacher-head"><div><h2 class="screen-title">Visão geral</h2><p>Gerencie suas turmas e acompanhe o aprendizado dos alunos.</p></div><button class="primary" id="btnPrimaryAction">Criar atividade</button></div><div class="teacher-kpis"><div class="teacher-kpi"><div class="v">'+turmas.length+'</div><div class="l">Turmas</div></div><div class="teacher-kpi"><div class="v">'+turmas.reduce((n,t)=>n+(t._count||0),0)+'</div><div class="l">Alunos</div></div><div class="teacher-kpi"><div class="v">'+turmas.reduce((n,t)=>n+(t._aufgaben||0),0)+'</div><div class="l">Atividades</div></div><div class="teacher-kpi"><div class="v">'+turmas.reduce((n,t)=>n+(t._entregas||0),0)+'</div><div class="l">Entregas</div></div></div><section class="teacher-section" id="analyticsSection"><div class="teacher-section-head"><h3>Análise rápida</h3><span>Suas turmas</span></div><div class="analytics-grid" id="teacherAnalyticsGrid"><div style="color:var(--ink-faint);font-size:.8rem">Calculando…</div></div><div id="teacherAnalyticsFocus" style="margin-top:11px;font-size:.8rem;color:var(--ink-soft)"></div></section><section class="teacher-section" id="classesSection"><div class="teacher-section-head"><h3>Minhas turmas</h3><span>'+turmas.length+' turma(s)</span></div><div class="class-grid" id="turmaGrid"></div></section><section class="teacher-section" id="createSection" style="display:none"><div class="teacher-section-head"><h3>Criar nova turma</h3><span>Os alunos entrarão usando o código gerado.</span></div><div class="create-row"><input id="inputNomeTurma" placeholder="Nome da turma (ex.: 9A Alemão)"><button class="primary" id="btnCriarTurma">Criar turma</button></div></section></main></div>';
   const grid=$('turmaGrid');
   grid.innerHTML=turmas.length?turmas.map(t=>'<div class="class-card" data-id="'+t.id+'"><div class="class-name">'+escapeHtml(t.nome)+'</div><div class="class-code">Código '+escapeHtml(t.codigo)+'</div><div class="class-meta"><span>'+(t._count||0)+' alunos</span><span>'+(t._aufgaben||0)+' atividades</span></div><div class="class-open">Abrir turma →</div></div>').join(''):'<div class="empty-state">Nenhuma turma criada ainda.</div>';
   grid.querySelectorAll('.class-card').forEach(c=>c.addEventListener('click',()=>abrirTurma(c.dataset.id)));
@@ -248,18 +251,18 @@ async function abrirTurma(turmaId){
 
     <div class="codigo-box" id="codigoBox">${escapeHtml(turmaAtual.codigo)}<small>Beitrittscode — antippen zum Kopieren</small></div>
 
-    <div class="section-label">alunos (${alunosStats.length})</div>
+    <div class="section-label">Alunos (${alunosStats.length})</div>
     <div id="alunosList" style="margin-bottom:32px;"></div>
 
-    <div class="section-label">Atividade für die Turma teilen</div>
+    <div class="section-label">Atividade para a turma</div>
     <div class="niveau-row" id="niveauRowTurma"></div>
     <textarea class="big" id="aufgabeTurmaInput" placeholder="z.B. 'Schreibe einen Beitrag zum Thema Freundschaft…'" style="width:100%;min-height:100px;border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;font-family:inherit;font-size:0.94rem;margin:10px 0;"></textarea>
-    <button class="primary" id="btnPostarAtividade">Atividade teilen</button>
+    <button class="primary" id="btnPostarAtividade">Enviar atividade</button>
 
     <div class="section-label" style="margin-top:28px;">Atividades enviadas</div>
     <div id="aufgabenList"></div>
 
-    <div class="section-label" style="margin-top:28px;">alunosabgaben</div>
+    <div class="section-label" style="margin-top:28px;">entregas dos alunos</div>
     <div id="entregasList"></div>
   `;
 
@@ -272,7 +275,7 @@ async function abrirTurma(turmaId){
 
   const alunosEl = $('alunosList');
   if (!alunosStats.length) {
-    alunosEl.innerHTML = `<div class="ms-empty">Noch keine alunos. Teile den Code oben, damit sie beitreten können.</div>`;
+    alunosEl.innerHTML = `<div class="ms-empty">Ainda não há alunos. Compartilhe o código acima para que eles possam entrar.</div>`;
   } else {
     alunosEl.innerHTML = alunosStats.map(a => `
       <div>
@@ -310,10 +313,10 @@ async function abrirTurma(turmaId){
               const dadosAlunoEntregas = await resAlunoEntregas.json();
               if (Array.isArray(dadosAlunoEntregas)) entregasAluno = dadosAlunoEntregas;
             } else {
-              console.error('Erro beim Laden der alunosabgaben:', resAlunoEntregas.status, await resAlunoEntregas.text());
+              console.error('Erro beim Erro ao carregar as entregas dos alunos:', resAlunoEntregas.status, await resAlunoEntregas.text());
             }
           } catch (err) {
-            console.error('Erro beim Laden der alunosabgaben:', err);
+            console.error('Erro beim Erro ao carregar as entregas dos alunos:', err);
           }
 
           const aufgabenMap = new Map((Array.isArray(aufgabenTurma) ? aufgabenTurma : []).map(a => [a.id, a]));
@@ -341,7 +344,7 @@ async function abrirTurma(turmaId){
     alunosEl.querySelectorAll('[data-reset-senha]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const uid = btn.dataset.resetSenha;
-        const senha = prompt('Neues Senha für diesen alunos eingeben (mindestens 8 Zeichen):');
+        const senha = prompt('Digite a nova senha para este aluno (mínimo de 8 caracteres):');
         if (senha === null) return;
         if (senha.length < 8) {
           alert('Das Senha muss mindestens 8 Zeichen lang sein.');
@@ -386,7 +389,7 @@ async function abrirTurma(turmaId){
 
     alunosEl.querySelectorAll('[data-remover]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        if (!confirm('Diesen alunos wirklich aus der Turma entfernen?')) return;
+        if (!confirm('Deseja realmente remover este aluno da turma?')) return;
         await sbFetch(`turma_membros?turma_id=eq.${turmaId}&user_id=eq.${btn.dataset.remover}`, { method:'DELETE' });
         abrirTurma(turmaId);
       });
@@ -416,12 +419,12 @@ async function abrirTurma(turmaId){
       });
       $('aufgabeTurmaInput').value = '';
       abrirTurma(turmaId); // recarrega
-    } catch(e) { alert('Erro beim Teilen der Atividade.'); }
+    } catch(e) { alert('Não foi possível enviar a atividade.'); }
   });
 
   const aufgabenEl = $('aufgabenList');
   if (!Array.isArray(aufgabenTurma) || !aufgabenTurma.length) {
-    aufgabenEl.innerHTML = `<div class="ms-empty">Noch keine Atividade geteilt.</div>`;
+    aufgabenEl.innerHTML = `<div class="ms-empty">Ainda não há atividades enviadas.</div>`;
   } else {
     aufgabenEl.innerHTML = aufgabenTurma.map(a => `
       <div class="aufgaben-list-item" style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
@@ -434,7 +437,7 @@ async function abrirTurma(turmaId){
 
     aufgabenEl.querySelectorAll('[data-del-aufgabe]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        if (!confirm('Diese Atividade wirklich löschen?')) return;
+        if (!confirm('Deseja realmente excluir esta atividade?')) return;
         await sbFetch(`aufgabas_turma?id=eq.${btn.dataset.delAtividade}`, { method:'DELETE' });
         abrirTurma(turmaId);
       });
@@ -445,7 +448,7 @@ async function abrirTurma(turmaId){
 
   const entregasEl = $('entregasList');
   if (!Array.isArray(entregasTurma) || !entregasTurma.length) {
-    entregasEl.innerHTML = '<div class="ms-empty">Noch keine alunosabgaben.</div>';
+    entregasEl.innerHTML = '<div class="ms-empty">Ainda não há entregas dos alunos.</div>';
   } else {
     entregasEl.innerHTML = entregasTurma.map(e => {
       const aufgabe = Array.isArray(aufgabenTurma) ? aufgabenTurma.find(a => a.id === e.tarefa_id) : null;
@@ -479,7 +482,7 @@ async function abrirTurma(turmaId){
         wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
         if (wrap.style.display === 'block') {
           if (!entrega?.feedback) {
-            wrap.innerHTML = '<div style="font-size:0.84rem;color:var(--ink-soft);">Noch keine KI-Correção. Die Entscheidung liegt bei dir.</div>';
+            wrap.innerHTML = '<div style="font-size:0.84rem;color:var(--ink-soft);">Ainda não há correção por IA. A decisão é sua.</div>';
           } else {
             const fb = entrega.feedback;
             wrap.innerHTML = `
