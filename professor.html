@@ -317,9 +317,11 @@ async function abrirTurma(turmaId){
     const ultima = registros[0]?.created_at ? new Date(registros[0].created_at).toLocaleDateString('de-DE') : '—';
     const perfil = perfis.find(p => p.user_id === m.user_id);
     const entregasAluno = Array.isArray(entregasTurma) ? entregasTurma.filter(e => e.aluno_id === m.user_id) : [];
+    const entregues = new Set(entregasAluno.map(e => e.tarefa_id).filter(Boolean)).size;
+    const pendentes = Math.max(aufgabenTurma.length - entregues, 0);
     const ultimaEntrega = entregasAluno[0]?.enviado_em ? new Date(entregasAluno[0].enviado_em) : null;
     const ultimaData = ultimaEntrega || (registros[0]?.created_at ? new Date(registros[0].created_at) : null);
-    return { user_id: m.user_id, nome: perfil?.nome || 'alunos', melhor, count: entregasAluno.length, historicoCount: registros.length, ultima: ultimaData ? ultimaData.toLocaleDateString('de-DE') : '—' };
+    return { user_id: m.user_id, nome: perfil?.nome || 'alunos', melhor, count: entregasAluno.length, entregues, pendentes, totalAufgaben: aufgabenTurma.length, historicoCount: registros.length, ultima: ultimaData ? ultimaData.toLocaleDateString('de-DE') : '—' };
   });
 
   $('app').innerHTML = `
@@ -359,7 +361,7 @@ async function abrirTurma(turmaId){
         <div class="aluno-row">
           <div>
             <div class="email">${escapeHtml(a.nome)}</div>
-            <div class="stats">${a.count} abgegebene Atividades · letzte: ${a.ultima}${a.historicoCount ? ` · ${a.historicoCount} freie Übungen` : ''}</div>
+            <div class="stats">Aufgaben: ${a.entregues}/${a.totalAufgaben} entregues${a.pendentes ? ` · ${a.pendentes} pendentes` : ''} · última: ${a.ultima}${a.historicoCount ? ` · ${a.historicoCount} freie Übungen` : ''}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <span class="badge">${escapeHtml(a.melhor)}</span>
