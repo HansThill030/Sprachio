@@ -1598,11 +1598,11 @@ function renderAufgabeInline(){
 
   $('aufgabeInlineText').textContent = state.aufgabaObj.aufgabe || '';
   $('aufgabeInlineBody').classList.toggle('collapsed', !aufgabeVisivel);
-  $('btnToggleAufgabe').textContent = aufgabeVisivel ? 'Ausblenden' : 'Einblenden';
+  $('btnToggleAtividade').textContent = aufgabeVisivel ? 'Ausblenden' : 'Einblenden';
 }
 
 document.getElementById('btnToggleAtividade')?.addEventListener('click', () => {
   aufgabeVisivel = !aufgabeVisivel;
   $('aufgabeInlineBody').classList.toggle('collapsed', !aufgabeVisivel);
-  $('btnToggleAufgabe').textContent = aufgabeVisivel ? 'Ausblenden' : 'Einblenden';
+  $('btnToggleAtividade').textContent = aufgabeVisivel ? 'Ausblenden' : 'Einblenden';
 });
