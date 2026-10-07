@@ -298,8 +298,8 @@ function renderTeileRow(){
 if ($('diffSlider')) {
   $('diffSlider').addEventListener('input', (e) => { state.schwierigkeit = parseInt(e.target.value,10); $('diffVal').textContent = state.schwierigkeit; });
 }
-if ($('btnToAufgabe')) {
-  $('btnToAufgabe').addEventListener('click', () => {
+if ($('btnToAtividade')) {
+  $('btnToAtividade').addEventListener('click', () => {
     state.aufgabaObj = null;
     $('aufgabeText').textContent = 'Klicke auf „Neues Thema generieren".';
     $('quelltext').style.display = 'none';
