@@ -49,15 +49,15 @@
     var box = document.createElement('div');
     box.id = 'sprachioAiTaskBox';
     box.style.cssText = 'border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;margin:12px 0;background:var(--bg);';
-    box.innerHTML = '<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:.88rem;margin-bottom:10px;">✨ Aufgabe mit KI erstellen</div>' +
+    box.innerHTML = '<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:.88rem;margin-bottom:10px;">✨ Criar atividade com IA</div>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">' +
       '<select id="sprachioAiLevel" style="padding:9px;border:1px solid var(--line);border-radius:6px;background:var(--card);font:inherit;"><option>A2</option><option selected>B1</option><option>C1</option></select>' +
       '<select id="sprachioAiType" style="padding:9px;border:1px solid var(--line);border-radius:6px;background:var(--card);font:inherit;"><option>Beitrag</option><option>Leserbrief</option><option>E-Mail</option><option>Erörterung</option></select>' +
       '</div>' +
-      '<input id="sprachioAiTheme" placeholder="Thema, z.B. Künstliche Intelligenz in der Schule" style="width:100%;box-sizing:border-box;margin-top:8px;padding:9px;border:1px solid var(--line);border-radius:6px;font:inherit;">' +
-      '<input id="sprachioAiContent" placeholder="Neuer Inhalt/Schwerpunkt, z.B. Datenschutz und soziale Medien" style="width:100%;box-sizing:border-box;margin-top:8px;padding:9px;border:1px solid var(--line);border-radius:6px;font:inherit;">' +
-      '<input id="sprachioAiBasis" placeholder="Optional: bestehendes Thema als Inspiration" style="width:100%;box-sizing:border-box;margin-top:8px;padding:9px;border:1px solid var(--line);border-radius:6px;font:inherit;">' +
-      '<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;"><button type="button" id="sprachioAiGenerate" class="primary">✨ Aufgabe generieren</button><span id="sprachioAiStatus" style="font-size:.78rem;color:var(--ink-faint);"></span></div>';
+      '<input id="sprachioAiTheme" placeholder="Tema, ex.: inteligência artificial na escola" style="width:100%;box-sizing:border-box;margin-top:8px;padding:9px;border:1px solid var(--line);border-radius:6px;font:inherit;">' +
+      '<input id="sprachioAiContent" placeholder="Novo conteúdo/foco, ex.: privacidade e redes sociais" style="width:100%;box-sizing:border-box;margin-top:8px;padding:9px;border:1px solid var(--line);border-radius:6px;font:inherit;">' +
+      '<input id="sprachioAiBasis" placeholder="Opcional: tema existente como inspiração" style="width:100%;box-sizing:border-box;margin-top:8px;padding:9px;border:1px solid var(--line);border-radius:6px;font:inherit;">' +
+      '<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;"><button type="button" id="sprachioAiGenerate" class="primary">✨ Gerar atividade</button><span id="sprachioAiStatus" style="font-size:.78rem;color:var(--ink-faint);"></span></div>';
     textarea.parentNode.insertBefore(box, textarea);
 
     document.getElementById('sprachioAiGenerate').addEventListener('click', async function () {
@@ -67,8 +67,8 @@
       var content = document.getElementById('sprachioAiContent').value.trim();
       var basis = document.getElementById('sprachioAiBasis').value.trim();
       var status = document.getElementById('sprachioAiStatus');
-      if (!theme) { status.textContent = 'Bitte ein Thema angeben.'; return; }
-      var btn = this; btn.disabled = true; status.textContent = 'Generiere…';
+      if (!theme) { status.textContent = 'Informe um tema.'; return; }
+      var btn = this; btn.disabled = true; status.textContent = 'Gerando…';
       try {
         var res = await fetch(cfg.SUPABASE_URL + '/functions/v1/generate-classroom-task', {
           method: 'POST',
@@ -79,7 +79,7 @@
         if (!res.ok || !data.text) throw new Error(data.error || 'Generierung fehlgeschlagen');
         textarea.value = data.text;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
-        status.textContent = '✓ Aufgabe erstellt. Du kannst sie vor dem Teilen bearbeiten.';
+        status.textContent = '✓ Atividade criada. Você pode editá-la antes de enviá-la.';
       } catch (e) { console.error('[Sprachio KI]', e); status.textContent = '❌ ' + e.message; }
       finally { btn.disabled = false; }
     });
@@ -109,10 +109,10 @@
     wrap.style.cssText = 'margin-top:28px;';
     var byTask = {};
     (history || []).forEach(function (h) { (byTask[h.aufgabe_id] ||= []).push(h); });
-    wrap.innerHTML = '<div class="section-label">📚 Ergebnisse dieser Klasse</div>' + ((tasks || []).length ? tasks.map(function (t) {
+    wrap.innerHTML = '<div class="section-label">📚 Resultados desta turma</div>' + ((tasks || []).length ? tasks.map(function (t) {
       var rows = byTask[t.id] || [];
-      return '<div class="aufgaben-list-item" style="margin-bottom:12px;"><div class="meta">' + esc(t.niveau || '') + ' · ' + (t.created_at ? new Date(t.created_at).toLocaleDateString('de-DE') : '') + '</div><div style="font-weight:600;margin-bottom:8px;">' + esc(t.aufgabenstellung) + '</div>' + (rows.length ? rows.map(function (h) { return '<details style="border-top:1px solid var(--line);padding:8px 0;"><summary style="cursor:pointer;font-size:.82rem;">Schüler ' + esc((h.user_id || '').slice(0,8)) + ' · ' + esc(h.niveau_atingido || '—') + '</summary><div style="font-size:.82rem;line-height:1.5;margin-top:8px;"><b>Text:</b><div style="white-space:pre-wrap;margin:4px 0 10px;">' + esc(h.texto || '') + '</div><b>Korrektur:</b><div style="white-space:pre-wrap;">' + esc(h.correcao || '') + '</div></div></details>'; }).join('') : '<div style="font-size:.8rem;color:var(--ink-faint);">Noch keine Abgaben.</div>') + '</div>';
-    }).join('') : '<div class="ms-empty">Noch keine Aufgabe geteilt.</div>');
+      return '<div class="aufgaben-list-item" style="margin-bottom:12px;"><div class="meta">' + esc(t.niveau || '') + ' · ' + (t.created_at ? new Date(t.created_at).toLocaleDateString('de-DE') : '') + '</div><div style="font-weight:600;margin-bottom:8px;">' + esc(t.aufgabenstellung) + '</div>' + (rows.length ? rows.map(function (h) { return '<details style="border-top:1px solid var(--line);padding:8px 0;"><summary style="cursor:pointer;font-size:.82rem;">Aluno ' + esc((h.user_id || '').slice(0,8)) + ' · ' + esc(h.niveau_atingido || '—') + '</summary><div style="font-size:.82rem;line-height:1.5;margin-top:8px;"><b>Texto:</b><div style="white-space:pre-wrap;margin:4px 0 10px;">' + esc(h.texto || '') + '</div><b>Correção:</b><div style="white-space:pre-wrap;">' + esc(h.correcao || '') + '</div></div></details>'; }).join('') : '<div style="font-size:.8rem;color:var(--ink-faint);">Ainda não há entregas.</div>') + '</div>';
+    }).join('') : '<div class="ms-empty">Ainda não há atividades enviadas.</div>');
     var app = document.getElementById('app');
     if (app) app.appendChild(wrap);
 
@@ -128,7 +128,7 @@
         var uid = button.getAttribute('data-verlauf');
         var count = (history || []).filter(function (h) { return h.user_id === uid; }).length;
         var stats = row.querySelector('.stats');
-        if (stats) stats.textContent = count + ' Aufgaben · nur diese Klasse';
+        if (stats) stats.textContent = count + ' atividades · somente esta turma';
       });
     }
   }
