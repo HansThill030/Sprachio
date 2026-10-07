@@ -33,15 +33,20 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Processa o token que o Supabase envia via URL hash (#access_token=...&type=...)
 // onAuthStateChange captura o SIGNED_IN logo após o Supabase processar o hash
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' && session) {
+async function continuar(session) {
+  if (!session) return;
+  const { data: perfil } = await supabase.from('perfis').select('role').eq('user_id', session.user.id).maybeSingle();
+  if (perfil?.role === 'teacher' || perfil?.role === 'admin') {
+    location.href = '/mfa';
+  } else {
     location.href = '/trainer#/config';
   }
+}
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session) continuar(session);
 });
-
-// Fallback: se já tem sessão válida, vai direto
 const { data: { session } } = await supabase.auth.getSession();
-if (session) location.href = '/trainer#/config';
+if (session) continuar(session);
 
 // Timeout de segurança — se não redirecionar em 5s, volta pro login
 setTimeout(() => { location.href = '/login'; }, 5000);
