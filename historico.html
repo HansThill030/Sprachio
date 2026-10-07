@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <script src="js/theme.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verlauf — Sprachio</title>
+<title>Histórico — Sprachio</title>
 <link rel="icon" href="assets/mark.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e1b4b">
@@ -31,30 +31,30 @@
     </a>
     <div class="header-actions">
       <span id="userEmail" style="font-size:0.8rem;color:var(--ink-faint);"></span>
-      <a class="home-link" href="/trainer#/config">+ Neue Übung</a>
-      <a class="home-link" href="/trainer-hub">← Hub</a>
+      <a class="home-link" href="/trainer#/config">+ Nova atividade</a>
+      <a class="home-link" href="/trainer-hub">← Início</a>
     </div>
   </div>
 
-  <h2 class="screen-title" style="margin-bottom:6px;">Verlauf</h2>
-  <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 24px;">Deine Schreibübungen &amp; Korrekturen</p>
+  <h2 class="screen-title" style="margin-bottom:6px;">Histórico</h2>
+  <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 24px;">Suas atividades de escrita e correções</p>
 
   <div class="stats-row" id="statsRow">
-    <div class="stat-card"><span class="stat-val" id="statTotal">—</span><span class="stat-lbl">Übungen gesamt</span></div>
-    <div class="stat-card"><span class="stat-val" id="statErreicht">—</span><span class="stat-lbl">Niveau erreicht</span></div>
-    <div class="stat-card"><span class="stat-val" id="statBestes">—</span><span class="stat-lbl">Bestes Niveau</span></div>
-    <div class="stat-card"><span class="stat-val" id="statLetzte">—</span><span class="stat-lbl">Letzte Übung</span></div>
+    <div class="stat-card"><span class="stat-val" id="statTotal">—</span><span class="stat-lbl">Atividades</span></div>
+    <div class="stat-card"><span class="stat-val" id="statErreicht">—</span><span class="stat-lbl">Nível alcançado</span></div>
+    <div class="stat-card"><span class="stat-val" id="statBestes">—</span><span class="stat-lbl">Melhor nível</span></div>
+    <div class="stat-card"><span class="stat-val" id="statLetzte">—</span><span class="stat-lbl">Última atividade</span></div>
   </div>
 
   <div id="chartWrap" style="display:none;margin-bottom:28px;">
-    <div class="section-label">Entwicklung über Zeit</div>
+    <div class="section-label">Evolução ao longo do tempo</div>
     <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;">
       <canvas id="progressChart" height="90"></canvas>
     </div>
   </div>
 
   <div id="errorAnalysisWrap" style="display:none;">
-    <div class="section-label" style="margin-top:8px;">Häufige Fehler</div>
+    <div class="section-label" style="margin-top:8px;">Erros mais frequentes</div>
     <div id="errorAnalysis"></div>
     <div id="fokusUebungWrap" style="margin-bottom:28px;"></div>
   </div>
@@ -111,7 +111,7 @@ function niveauParaNum(n){
 
 async function carregar(){
   const el=$('historicoLista');
-  el.innerHTML='<div class="hist-loading">Laden&hellip;</div>';
+  el.innerHTML='<div class="hist-loading">Carregando&hellip;</div>';
   try {
     const res=await sbFetch('historico?select=*&order=created_at.desc&limit=200');
     todosDados=await res.json();
@@ -121,7 +121,7 @@ async function carregar(){
     analisarErros();
     renderChart();
   } catch(e){
-    el.innerHTML='<div class="hist-empty">Fehler beim Laden. Bitte Seite neu laden.</div>';
+    el.innerHTML='<div class="hist-empty">Não foi possível carregar. Recarregue a página.</div>';
   }
 }
 
@@ -147,7 +147,7 @@ function renderLista(){
   const el=$('historicoLista');
   const dados=filtroAtivo==='all'?todosDados:todosDados.filter(r=>r.niveau===filtroAtivo);
   if(dados.length===0){
-    el.innerHTML='<div class="hist-empty">Noch keine Einträge für dieses Niveau.</div>';
+    el.innerHTML='<div class="hist-empty">Ainda não há atividades neste nível.</div>';
     return;
   }
   el.innerHTML=dados.map((r,idx)=>{
@@ -173,7 +173,7 @@ function renderLista(){
   });
 }
 
-/* ---------- Häufige Fehler ---------- */
+/* ---------- Erros mais frequentes ---------- */
 let padroesDetectados = [];
 
 function analisarErros(){
@@ -249,7 +249,7 @@ Erstelle eine kurze, gezielte Übung (3-5 Aufgaben) speziell zu diesen wiederkeh
     const texto = await chamarGeminiHist(prompt, 1500);
     $('fokusResult').innerHTML = `<div class="fokus-result">${escapeHtml(texto)}</div>`;
   } catch(e) {
-    $('fokusResult').innerHTML = `<div class="fokus-result">Fehler beim Erstellen der Übung. Bitte nochmal versuchen.</div>`;
+    $('fokusResult').innerHTML = `<div class="fokus-result">Não foi possível criar o exercício. Tente novamente.</div>`;
   }
   btn.disabled = false;
   btn.textContent = '🎯 Fokus-Übung zu diesen Fehlern generieren';
