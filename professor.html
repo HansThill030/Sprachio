@@ -156,6 +156,9 @@ async function init(){
     return;
   }
 
+  const mfaOk = await garantirMFA();
+  if (!mfaOk) return;
+
   await carregarTurmas();
   renderHome();
 }
