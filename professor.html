@@ -17,53 +17,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="css/styles.css">
 <style>
-.turma-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:24px;}
-.turma-card{background:var(--card);padding:18px 20px;cursor:pointer;transition:background .15s ease;}
-.turma-card:hover{background:#faf9ff;}
-.turma-card .nome{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:4px;}
-.turma-card .codigo{font-family:'Space Grotesk',sans-serif;font-size:0.78rem;color:var(--accent);letter-spacing:0.05em;}
-.turma-card .count{font-size:0.8rem;color:var(--ink-soft);margin-top:6px;}
-
-.form-inline{display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap;}
-.form-inline input{flex:1;min-width:200px;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-sm);font-family:inherit;font-size:0.94rem;outline:none;}
-.form-inline input:focus{border-color:var(--indigo);}
-
-.aluno-row{
-  display:flex;justify-content:space-between;align-items:center;
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
-  padding:13px 16px;margin-bottom:8px;
-}
-.aluno-row .email{font-weight:600;font-size:0.9rem;}
-.aluno-row .stats{font-size:0.78rem;color:var(--ink-soft);}
-.aluno-row .badge{
-  font-family:'Space Grotesk',sans-serif;font-size:0.76rem;font-weight:700;
-  background:var(--bg);color:var(--accent);padding:3px 10px;border-radius:20px;
-}
-
-.codigo-box{
-  background:var(--bg);border:1px dashed var(--line);border-radius:var(--r-sm);
-  padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;
-  letter-spacing:0.08em;color:var(--accent);text-align:center;margin-bottom:20px;cursor:pointer;
-}
-.codigo-box small{display:block;font-family:'Inter',sans-serif;font-size:0.68rem;font-weight:400;color:var(--ink-faint);letter-spacing:0;margin-top:2px;}
-
-.aufgaben-list-item{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
-  padding:12px 16px;margin-bottom:8px;font-size:0.88rem;
-}
-.aufgaben-list-item .meta{font-size:0.72rem;color:var(--ink-faint);margin-bottom:4px;}
-.teacher-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 28px;}
-.teacher-summary-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;}
-.teacher-summary-card .value{font-family:'Space Grotesk',sans-serif;font-size:1.55rem;font-weight:700;}
-.teacher-summary-card .label{font-size:.74rem;color:var(--ink-faint);margin-top:3px;}
-@media(max-width:620px){.teacher-summary{grid-template-columns:1fr 1fr}.teacher-summary-card:last-child{grid-column:1/-1;}}
-.no-access{text-align:center;padding:80px 20px;color:var(--ink-soft);}
-
-.teacher-analytics{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin:0 0 28px;}
-.teacher-analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px;}
-.teacher-analytics-card{border:1px solid var(--line);border-radius:var(--r-sm);padding:13px;background:var(--bg);}.teacher-analytics-card .v{font-family:"Space Grotesk",sans-serif;font-size:1.3rem;font-weight:700}.teacher-analytics-card .l{font-size:.72rem;color:var(--ink-faint)}
-
-:root[data-theme="dark"] .turma-card:hover{background:var(--surface-soft);}
+.teacher-shell{display:grid;grid-template-columns:220px minmax(0,1fr);gap:26px;align-items:start;margin-top:24px}.teacher-nav{position:sticky;top:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:9px}.teacher-nav-title{padding:10px 12px 12px;font:700 .95rem 'Space Grotesk',sans-serif}.teacher-nav button{width:100%;text-align:left;border:0;background:transparent;color:var(--ink-soft);padding:10px 12px;border-radius:var(--r-sm);font:600 .82rem Inter,sans-serif;cursor:pointer}.teacher-nav button:hover,.teacher-nav button.active{background:var(--surface-soft);color:var(--ink)}.teacher-nav .sep{height:1px;background:var(--line);margin:8px 0}.teacher-content{min-width:0}.teacher-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:20px}.teacher-head h2{margin:0 0 5px}.teacher-head p{margin:0;color:var(--ink-soft);font-size:.86rem}.teacher-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:18px}.teacher-kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px}.teacher-kpi .v{font:700 1.4rem 'Space Grotesk',sans-serif}.teacher-kpi .l{font-size:.7rem;color:var(--ink-faint);margin-top:3px}.teacher-section{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:17px;margin-bottom:16px}.teacher-section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.teacher-section-head h3{margin:0;font:700 .98rem 'Space Grotesk',sans-serif}.teacher-section-head span{font-size:.7rem;color:var(--ink-faint)}.class-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:9px}.class-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px;cursor:pointer;transition:.15s}.class-card:hover{background:var(--surface-soft);transform:translateY(-1px)}.class-name{font:700 1rem 'Space Grotesk',sans-serif}.class-code{font:600 .7rem 'Space Grotesk',sans-serif;color:var(--accent);margin-top:4px;letter-spacing:.06em}.class-meta{display:flex;gap:14px;margin-top:12px;font-size:.73rem;color:var(--ink-faint)}.class-open{margin-top:13px;color:var(--accent);font-size:.75rem;font-weight:700}.create-row{display:flex;gap:8px}.create-row input{flex:1;min-width:0;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--ink);font:inherit;outline:none}.analytics-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.analytics-card{background:var(--surface-soft);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px}.analytics-card .v{font:700 1.15rem 'Space Grotesk',sans-serif}.analytics-card .l{font-size:.66rem;color:var(--ink-faint)}.empty-state{padding:25px;text-align:center;color:var(--ink-soft);border:1px dashed var(--line);border-radius:var(--r-sm)}@media(max-width:800px){.teacher-shell{grid-template-columns:1fr}.teacher-nav{position:static;display:flex;overflow:auto;padding:5px}.teacher-nav-title,.teacher-nav .sep{display:none}.teacher-nav button{width:auto;white-space:nowrap}.teacher-kpis{grid-template-columns:1fr 1fr}.analytics-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:520px){.teacher-head{flex-direction:column}.analytics-grid{grid-template-columns:1fr 1fr}.create-row{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -212,54 +166,18 @@ async function carregarAnalyticaProfessor(){
 }
 
 function renderHome(){
-  turmaAtual = null;
-  $('app').innerHTML = `
-    <h2 class="screen-title" style="margin-bottom:6px;">Área do professor</h2>
-    <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 24px;">Crie turmas, compartilhe o código de acesso e acompanhe o progresso dos seus alunos.</p>
-
-    <div class="form-inline">
-      <input type="text" id="inputNomeTurma" placeholder="Nome da turma (ex.: 9A Alemão)">
-      <button class="primary" id="btnCriarTurma">+ Criar turma</button>
-    </div>
-
-    <div class="teacher-summary">
-      <div class="teacher-summary-card"><div class="value">${turmas.length}</div><div class="label">Turman</div></div>
-      <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._count||0),0)}</div><div class="label">Alunos</div></div>
-      <div class="teacher-summary-card"><div class="value">${turmas.reduce((n,t)=>n+(t._aufgaben||0),0)}</div><div class="label">Atividades enviadas</div></div>
-    </div>
-
-    <div class="teacher-analytics" id="teacherAnalytics">
-      <strong>Análise das turmas</strong>
-      <div class="teacher-analytics-grid" id="teacherAnalyticsGrid"><div style="color:var(--ink-faint);font-size:.8rem;">Calculando…</div></div>
-      <div id="teacherAnalyticsFocus" style="margin-top:12px;font-size:.82rem;color:var(--ink-soft);"></div>
-    </div>
-
-    <div class="section-label">Suas turmas</div>
-    <div class="turma-grid" id="turmaGrid"></div>
-  `;
-
-  const grid = $('turmaGrid');
-  if (!turmas.length) {
-    grid.innerHTML = `<div class="ms-empty" style="padding:20px;">Nenhuma turma criada ainda.</div>`;
-  } else {
-    grid.innerHTML = turmas.map(t => `
-      <div class="turma-card" data-id="${t.id}">
-        <div class="nome">${escapeHtml(t.nome)}</div>
-        <div class="codigo">Código: ${escapeHtml(t.codigo)}</div>
-        <div class="count">${t._count} alunos</div>
-      </div>`).join('');
-    grid.querySelectorAll('.turma-card').forEach(card => {
-      card.addEventListener('click', () => abrirTurma(card.dataset.id));
-    });
-  }
-
+  turmaAtual=null;
+  $('app').innerHTML='<div class="teacher-shell"><aside class="teacher-nav"><div class="teacher-nav-title">Área do professor</div><button class="active" data-nav="overview">Visão geral</button><button data-nav="classes">Minhas turmas</button><button data-nav="analytics">Análise</button><div class="sep"></div><button id="navCreate">+ Criar turma</button></aside><main class="teacher-content"><div class="teacher-head"><div><h2 class="screen-title">Visão geral</h2><p>Gerencie suas turmas e acompanhe o aprendizado dos alunos.</p></div><button class="primary" id="btnPrimaryAction">Criar atividade</button></div><div class="teacher-kpis"><div class="teacher-kpi"><div class="v">'+turmas.length+'</div><div class="l">Turmas</div></div><div class="teacher-kpi"><div class="v">'+turmas.reduce((n,t)=>n+(t._count||0),0)+'</div><div class="l">Alunos</div></div><div class="teacher-kpi"><div class="v">'+turmas.reduce((n,t)=>n+(t._aufgaben||0),0)+'</div><div class="l">Atividades</div></div><div class="teacher-kpi"><div class="v">—</div><div class="l">Entregas</div></div></div><section class="teacher-section" id="analyticsSection"><div class="teacher-section-head"><h3>Análise rápida</h3><span>Suas turmas</span></div><div class="analytics-grid" id="teacherAnalyticsGrid"><div style="color:var(--ink-faint);font-size:.8rem">Calculando…</div></div><div id="teacherAnalyticsFocus" style="margin-top:11px;font-size:.8rem;color:var(--ink-soft)"></div></section><section class="teacher-section" id="classesSection"><div class="teacher-section-head"><h3>Minhas turmas</h3><span>'+turmas.length+' turma(s)</span></div><div class="class-grid" id="turmaGrid"></div></section><section class="teacher-section" id="createSection" style="display:none"><div class="teacher-section-head"><h3>Criar nova turma</h3><span>Os alunos entrarão usando o código gerado.</span></div><div class="create-row"><input id="inputNomeTurma" placeholder="Nome da turma (ex.: 9A Alemão)"><button class="primary" id="btnCriarTurma">Criar turma</button></div></section></main></div>';
+  const grid=$('turmaGrid');
+  grid.innerHTML=turmas.length?turmas.map(t=>'<div class="class-card" data-id="'+t.id+'"><div class="class-name">'+escapeHtml(t.nome)+'</div><div class="class-code">Código '+escapeHtml(t.codigo)+'</div><div class="class-meta"><span>'+(t._count||0)+' alunos</span><span>'+(t._aufgaben||0)+' atividades</span></div><div class="class-open">Abrir turma →</div></div>').join(''):'<div class="empty-state">Nenhuma turma criada ainda.</div>';
+  grid.querySelectorAll('.class-card').forEach(c=>c.addEventListener('click',()=>abrirTurma(c.dataset.id)));
   carregarAnalyticaProfessor();
-
-  $('btnCriarTurma').addEventListener('click', criarTurma);
-  $('inputNomeTurma').addEventListener('keydown', (e) => { if (e.key === 'Enter') criarTurma(); });
-}
-
-async function criarTurma(){
+  document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-nav]').forEach(x=>x.classList.remove('active'));b.classList.add('active');if(b.dataset.nav==='classes')$('classesSection').scrollIntoView({behavior:'smooth'});if(b.dataset.nav==='analytics')$('analyticsSection').scrollIntoView({behavior:'smooth'});}));
+  $('navCreate').addEventListener('click',()=>{const el=$('createSection');el.style.display=el.style.display==='none'?'block':'none';if(el.style.display==='block')el.scrollIntoView({behavior:'smooth'});});
+  $('btnPrimaryAction').addEventListener('click',()=>turmas.length?abrirTurma(turmas[0].id):$('navCreate').click());
+  $('btnCriarTurma').addEventListener('click',criarTurma);
+  $('inputNomeTurma').addEventListener('keydown',e=>{if(e.key==='Enter')criarTurma();});
+}async function criarTurma(){
   const nome = $('inputNomeTurma').value.trim();
   if (!nome) return;
   const codigo = gerarCodigo();
