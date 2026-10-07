@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="pt-BR">
 <head>
 <script src="js/consent.js"></script>
 
@@ -89,7 +89,7 @@ textarea.big.small{min-height:220px;}
   <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 26px;max-width:520px;">Corrija textos da aula — fotografe uma folha manuscrita ou digite o texto. Você não precisa usar uma atividade gerada pelo Sprachio.</p>
 
   <div id="formArea">
-    <span class="field-label">Niveau</span>
+    <span class="field-label">Nível</span>
     <div class="niveau-row" id="niveauRow"></div>
 
     <div id="turmaAufgabenWrap" style="display:none;margin-bottom:16px;">
@@ -98,24 +98,24 @@ textarea.big.small{min-height:220px;}
     </div>
 
     <span class="field-label">Qual era a atividade? (tema, instrução ou proposta do professor…)</span>
-    <textarea class="big" id="aufgabenstellung" placeholder="z.B. 'Schreibe einen Beitrag zum Thema Freundschaft. Beantworte: Was ist für dich Freundschaft? Nenne ein Beispiel.'" style="margin-bottom:20px;"></textarea>
+    <textarea class="big" id="aufgabenstellung" placeholder="ex.: 'Escreva um texto sobre amizade. Responda: o que amizade significa para você? Dê um exemplo.'" style="margin-bottom:20px;"></textarea>
 
     <div class="mode-tabs">
       <button class="mode-tab active" data-mode="foto">📷 Foto</button>
-      <button class="mode-tab" data-mode="text">⌨️ Text eintippen</button>
+      <button class="mode-tab" data-mode="text">⌨️ Digitar texto</button>
     </div>
 
     <div id="modoFoto">
       <div class="upload-zone" id="uploadZone">
         <div style="font-size:2rem;">📷</div>
-        <p>Foto(s) auswählen oder aufnehmen — mehrere Seiten möglich</p>
+        <p>Escolha ou tire foto(s) — várias páginas são permitidas</p>
       </div>
       <input type="file" id="fileInput" accept="image/*" capture="environment" multiple style="display:none;">
       <div id="galeriaFotos" class="galeria-fotos"></div>
     </div>
 
     <div id="modoText" style="display:none;">
-      <textarea class="big small" id="textoDigitado" placeholder="Schülertext hier eintippen…"></textarea>
+      <textarea class="big small" id="textoDigitado" placeholder="Digite o texto do aluno aqui…"></textarea>
     </div>
 
     <div class="nav-row">
@@ -127,9 +127,9 @@ textarea.big.small{min-height:220px;}
   <div class="loading-big" id="loadingResult" style="display:none;"><div class="spin"></div>Text wird analysiert&hellip;</div>
 
   <div class="feedback" id="feedback" style="display:none;margin-top:24px;">
-    <div class="stamp" id="stamp"><div class="niveau" id="stampNiveau">B1</div><div class="tag" id="stampTag">erreicht</div></div>
+    <div class="stamp" id="stamp"><div class="niveau" id="stampNível">B1</div><div class="tag" id="stampTag">erreicht</div></div>
     <div class="fb-section"><h3>Bewertung</h3><div id="fbErfuellung"></div></div>
-    <div class="fb-section"><h3>Niveaueinschätzung</h3><p id="fbAufbau"></p></div>
+    <div class="fb-section"><h3>Níveleinschätzung</h3><p id="fbAufbau"></p></div>
     <div class="fb-section"><h3>Análise linguística</h3><div id="fbSprache"></div></div>
     <div class="fb-section"><h3>Feedback</h3><ul class="korrekturen" id="korrekturenList"></ul></div>
     <div class="tip-box" id="fbTip"></div>
@@ -181,33 +181,33 @@ function mensagemErroAmigavel(e){
   if (msg.includes('timeout') || msg.includes('timed out')) return '⏱️ Die Anfrage hat zu lange gedauert (evtl. Foto zu groß). Bitte versuche es erneut oder mit einem kleineren Foto.';
   if (msg.includes('json') || msg.includes('unexpected token')) return '⚠️ Die KI-Antwort konnte nicht verarbeitet werden. Bitte versuche es nochmal.';
   if (msg.includes('502') || msg.includes('503') || msg.includes('gemini request failed')) return '🔧 Der KI-Dienst ist gerade überlastet. Bitte in ein paar Minuten erneut versuchen.';
-  return '❌ Fehler bei der Korrektur. Bitte nochmal versuchen.';
+  return '❌ Não foi possível corrigir o texto. Tente novamente.';
 }
 function wortlisteHinweis(niveau){
   const map = {
-    A2: 'der Goethe-Institut A2-Wortliste (GER-Niveau A2)',
-    B1: 'der Goethe-Institut B1-Wortliste (GER-Niveau B1)',
-    C1: 'den Goethe-Institut B2- und C1-Wortlisten (GER-Niveau B2/C1)'
+    A2: 'der Goethe-Institut A2-Wortliste (GER-Nível A2)',
+    B1: 'der Goethe-Institut B1-Wortliste (GER-Nível B1)',
+    C1: 'den Goethe-Institut B2- und C1-Wortlisten (GER-Nível B2/C1)'
   };
-  return map[niveau] || 'dem entsprechenden GER-Niveau';
+  return map[niveau] || 'dem entsprechenden GER-Nível';
 }
 
 const state = { niveau:'B1', modo:'foto', imagens:[] }; // imagens: [{mimeType, data(base64), previewUrl}]
 let ultimaAufgabenstellung = '';
 
-/* ---------- Niveau ---------- */
-function renderNiveauRow(){
+/* ---------- Nível ---------- */
+function renderNívelRow(){
   const row = $('niveauRow');
   row.innerHTML = '';
   NIVEAUS.forEach(n => {
     const btn = document.createElement('button');
     btn.className = 'niveau-btn' + (n === state.niveau ? ' active' : '');
     btn.textContent = niveauLabel(n);
-    btn.addEventListener('click', () => { state.niveau = n; renderNiveauRow(); atualizarBotao(); });
+    btn.addEventListener('click', () => { state.niveau = n; renderNívelRow(); atualizarBotao(); });
     row.appendChild(btn);
   });
 }
-renderNiveauRow();
+renderNívelRow();
 carregarAufgabenTurma();
 
 /* ---------- Aufgaben da turma (se o aluno for membro) ---------- */
@@ -232,7 +232,7 @@ async function carregarAufgabenTurma(){
         const a = aufgabas[parseInt(el.dataset.i,10)];
         $('aufgabenstellung').value = a.aufgabenstellung;
         state.niveau = a.niveau;
-        renderNiveauRow();
+        renderNívelRow();
         atualizarBotao();
         document.querySelectorAll('.turma-aufgabe-item').forEach(e => e.style.borderColor = '');
         el.style.borderColor = 'var(--indigo)';
@@ -258,7 +258,7 @@ $('uploadZone').addEventListener('click', () => $('fileInput').click());
 $('fileInput').addEventListener('change', async (e) => {
   const files = Array.from(e.target.files || []);
   if (state.imagens.length + files.length > 8) {
-    alert('Maximal 8 Fotos pro Korrektur. Bitte entferne zuerst ein paar Fotos.');
+    alert('Maximal 8 Fotos pro A correção não foi concluída. Remova algumas fotos e tente novamente.');
     e.target.value = '';
     return;
   }
@@ -452,7 +452,7 @@ async function runKorrekturDSD1(aufgabenstellung, textoDigitado, imagens){
     ? `Der Schülertext liegt als ${imagens.length > 1 ? imagens.length + ' Fotos eines handschriftlichen, mehrseitigen Textes' : 'Foto eines handschriftlichen Blatts'} vor. Führe zuerst Schritt 1 (Diplomatische Transkription) direkt anhand des/der Fotos durch${imagens.length > 1 ? ' (Seiten in der gegebenen Reihenfolge zusammenhängend transkribieren)' : ''}.`
     : `SCHÜLERTEXT (bereits digital erfasst, KEINE Transkription nötig):\n"""\n${textoDigitado}\n"""`;
 
-  const prompt = `Du bist eine erfahrene DaF-Lehrkraft sowie DSD-I-Prüferin mit umfassender Erfahrung in der Korrektur und Kalibrierung von Schülertexten. Du arbeitest streng nach den offiziellen Bewertungskriterien der Schriftlichen Kommunikation (DSD I, Anlage 12), bewertest jedoch stets wohlwollend und niveaugerecht auf A2/B1-Niveau.
+  const prompt = `Du bist eine erfahrene DaF-Lehrkraft sowie DSD-I-Prüferin mit umfassender Erfahrung in der Korrektur und Kalibrierung von Schülertexten. Du arbeitest streng nach den offiziellen Bewertungskriterien der Schriftlichen Kommunikation (DSD I, Anlage 12), bewertest jedoch stets wohlwollend und niveaugerecht auf A2/B1-Nível.
 
 AUFGABE: Analysiere und bewerte die folgende Schülerarbeit zur Schriftlichen Kommunikation im DSD I${temFoto ? ' in fünf Schritten' : ''}.
 
@@ -464,7 +464,7 @@ ${quelleInfo}
 ${temFoto ? TRANSKRIPTIONSREGELN : ''}
 
 WICHTIGE BEWERTUNGSGRUNDSÄTZE:
-- DSD-I-Niveau (A2/B1) als Maßstab
+- DSD-I-Nível (A2/B1) als Maßstab
 - Wohlwollende Bewertung
 - Verständlichkeit hat Vorrang vor Fehlerfreiheit
 - Strukturen (Kategorie 6) und Grammatik (Kategorie 7) STRIKT GETRENNT bewerten — Strukturen = Vielfalt und Angemessenheit, Grammatik = Korrektheit
@@ -608,7 +608,7 @@ function renderFeedbackIVA2(json){
   const s4 = json.schritt4_sprachanalyse || {};
   const s5 = json.schritt5_feedback || {};
 
-  $('stampNiveau').textContent = s3.niveaueinschaetzung || '—';
+  $('stampNível').textContent = s3.niveaueinschaetzung || '—';
   $('stampTag').textContent = `${s3.gesamtpunkte ?? '?'} / ${s3.max_punkte ?? 20} Punkte`;
 
   const kategorien = [
@@ -663,11 +663,11 @@ async function runKorrekturGenerico(aufgabenstellung, textoDigitado, imagens){
     ? `Der Schülertext liegt als ${imagens.length > 1 ? imagens.length + ' Fotos eines handschriftlichen, mehrseitigen Textes' : 'Foto eines handschriftlichen Blatts'} vor. Transkribiere zuerst wortgetreu (siehe Transkriptionsregeln), bevor du bewertest.`
     : `SCHÜLERTEXT (bereits digital erfasst):\n"""\n${textoDigitado}\n"""`;
 
-  const prompt = `Du bist ein erfahrener Prüfer für Deutsch als Fremdsprache. Bewerte den folgenden Schülertext auf Zielniveau DSD II (Niveau B2/C1). Sei präzise und schnell, keine langen Einleitungen.
+  const prompt = `Du bist ein erfahrener Prüfer für Deutsch als Fremdsprache. Bewerte den folgenden Schülertext auf Zielniveau DSD II (Nível B2/C1). Sei präzise und schnell, keine langen Einleitungen.
 
 HINWEIS: Dies ist eine vorläufige, allgemeine Korrektur (kein offizielles Bewertungsraster für dieses Prüfungsformat). Dies ist außerdem eine freie Aufgabe aus dem Unterricht, keine automatisch generierte Aufgabe.
 
-Wortschatz-Kalibrierung: Bewerte den verwendeten Wortschatz auch im Vergleich zu ${wortlisteHinweis(state.niveau)} — erwähne im "sprache"-Feld, ob der Wortschatz spürbar über, unter oder genau auf diesem Niveau liegt.
+Wortschatz-Kalibrierung: Bewerte den verwendeten Wortschatz auch im Vergleich zu ${wortlisteHinweis(state.niveau)} — erwähne im "sprache"-Feld, ob der Wortschatz spürbar über, unter oder genau auf diesem Nível liegt.
 
 Vorgegebene Aufgabenstellung/Thema: ${aufgabenstellung}
 
@@ -676,7 +676,7 @@ ${quelleInfo}
 ${TRANSKRIPTIONSREGELN}
 
 Antworte NUR mit einem JSON-Objekt, keine Einleitung, keine Markdown-Backticks, auf Deutsch, kurz und konkret. Format:
-{"transkription": "vollständiger Text, wortgetreu (bei Foto: transkribiert; bei getipptem Text: unverändert übernommen)", "niveau_einschaetzung": "geschätztes tatsächliches Niveau des Textes", "status": "erreicht" | "knapp erreicht" | "noch nicht erreicht" | "übertroffen", "erfuellung": "1-2 Sätze zur Aufgabenerfüllung", "aufbau": "1-2 Sätze zu Struktur/Konnektoren", "sprache": "1-2 Sätze zu Wortschatz und Grammatik", "korrekturen": [{"original":"kurzer fehlerhafter Ausschnitt","korrektur":"korrigierte Version","erklaerung":"kurze Erklärung"}], "tipp": "ein konkreter nächster Schritt", "vokabelkarten": [{"wort": "...", "bedeutung": "kurze Erklärung/Übersetzung auf Deutsch", "beispiel": "Beispielsatz mit dem Wort"}]}
+{"transkription": "vollständiger Text, wortgetreu (bei Foto: transkribiert; bei getipptem Text: unverändert übernommen)", "niveau_einschaetzung": "geschätztes tatsächliches Nível des Textes", "status": "erreicht" | "knapp erreicht" | "noch nicht erreicht" | "übertroffen", "erfuellung": "1-2 Sätze zur Aufgabenerfüllung", "aufbau": "1-2 Sätze zu Struktur/Konnektoren", "sprache": "1-2 Sätze zu Wortschatz und Grammatik", "korrekturen": [{"original":"kurzer fehlerhafter Ausschnitt","korrektur":"korrigierte Version","erklaerung":"kurze Erklärung"}], "tipp": "ein konkreter nächster Schritt", "vokabelkarten": [{"wort": "...", "bedeutung": "kurze Erklärung/Übersetzung auf Deutsch", "beispiel": "Beispielsatz mit dem Wort"}]}
 "vokabelkarten": 3-5 nützliche Vokabeln zum Wiederholen.
 Maximal 6 Korrekturen, wichtigste zuerst.`;
 
@@ -688,7 +688,7 @@ Maximal 6 Korrekturen, wichtigste zuerst.`;
 
 /* ---------- Render (idêntico ao trainer.html) ---------- */
 function renderFeedbackGenerico(json){
-  $('stampNiveau').textContent = json.niveau_einschaetzung || '—';
+  $('stampNível').textContent = json.niveau_einschaetzung || '—';
   $('stampTag').textContent = json.status || '';
   $('fbErfuellung').innerHTML = `<p style="margin:0;font-size:0.94rem;line-height:1.6;color:var(--ink-soft);">${escapeHtml(json.erfuellung || '')}</p>
     <p style="margin-top:10px;font-size:0.76rem;color:var(--warn);">⚠ Vorläufige Korrektur — offizielles Bewertungsraster für dieses Format folgt.</p>`;
@@ -714,7 +714,7 @@ function renderFeedbackDSD1(json){
   const s4 = json.schritt4_sprachanalyse || {};
   const s5 = json.schritt5_feedback || {};
 
-  $('stampNiveau').textContent = s3.niveaueinschaetzung || '—';
+  $('stampNível').textContent = s3.niveaueinschaetzung || '—';
   $('stampTag').textContent = `${s3.gesamtpunkte ?? '?'} / ${s3.max_punkte ?? 24} Punkte`;
 
   const kategorien = [
@@ -778,11 +778,11 @@ $('btnMusterloesung').addEventListener('click', async () => {
   btn.disabled = true;
   btn.textContent = 'Wird erstellt…';
   $('musterloesungResult').innerHTML = '';
-  const prompt = `Du bist DaF-Lehrkraft. Schreibe eine vorbildliche Musterlösung (Beispieltext) für folgende Aufgabe auf Niveau ${niveauLabel(state.niveau)}:
+  const prompt = `Du bist DaF-Lehrkraft. Schreibe eine vorbildliche Musterlösung (Beispieltext) für folgende Aufgabe auf Nível ${niveauLabel(state.niveau)}:
 
 ${ultimaAufgabenstellung}
 
-Der Text soll ein realistisches, gut geschriebenes Beispiel für dieses Niveau sein — nicht perfekt-akademisch, sondern wie ein starker Schüler auf diesem Niveau schreiben würde. Antworte NUR mit dem Text selbst, keine Einleitung, keine Erklärung, keine Anführungszeichen.`;
+Der Text soll ein realistisches, gut geschriebenes Beispiel für dieses Nível sein — nicht perfekt-akademisch, sondern wie ein starker Schüler auf diesem Nível schreiben würde. Antworte NUR mit dem Text selbst, keine Einleitung, keine Erklärung, keine Anführungszeichen.`;
   try {
     const texto = await callGemini(prompt, 1500);
     $('musterloesungResult').innerHTML = `<div class="fokus-result" style="margin-top:12px;">${escapeHtml(texto)}</div>`;
