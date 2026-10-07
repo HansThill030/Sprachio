@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <script src="js/theme.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Freie Korrektur — Sprachio</title>
+<title>Correção livre — Sprachio</title>
 <link rel="icon" href="assets/mark.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e1b4b">
@@ -85,19 +85,19 @@ textarea.big.small{min-height:220px;}
     </div>
   </div>
 
-  <h2 class="screen-title" style="margin-bottom:6px;">Freie Korrektur</h2>
-  <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 26px;max-width:520px;">Korrigiere Texte aus dem Unterricht — fotografiere ein handschriftliches Blatt oder tippe den Text ein. Nicht an die generierten Sprachio-Aufgaben gebunden.</p>
+  <h2 class="screen-title" style="margin-bottom:6px;">Correção livre</h2>
+  <p style="color:var(--ink-soft);font-size:0.92rem;margin:0 0 26px;max-width:520px;">Corrija textos da aula — fotografe uma folha manuscrita ou digite o texto. Você não precisa usar uma atividade gerada pelo Sprachio.</p>
 
   <div id="formArea">
     <span class="field-label">Niveau</span>
     <div class="niveau-row" id="niveauRow"></div>
 
     <div id="turmaAufgabenWrap" style="display:none;margin-bottom:16px;">
-      <span class="field-label">Aufgabe aus deiner Klasse</span>
+      <span class="field-label">Atividade da sua turma</span>
       <div id="turmaAufgabenList"></div>
     </div>
 
-    <span class="field-label">Was war die Aufgabe? (von der Lehrkraft, Thema, Anweisung…)</span>
+    <span class="field-label">Qual era a atividade? (tema, instrução ou proposta do professor…)</span>
     <textarea class="big" id="aufgabenstellung" placeholder="z.B. 'Schreibe einen Beitrag zum Thema Freundschaft. Beantworte: Was ist für dich Freundschaft? Nenne ein Beispiel.'" style="margin-bottom:20px;"></textarea>
 
     <div class="mode-tabs">
@@ -130,7 +130,7 @@ textarea.big.small{min-height:220px;}
     <div class="stamp" id="stamp"><div class="niveau" id="stampNiveau">B1</div><div class="tag" id="stampTag">erreicht</div></div>
     <div class="fb-section"><h3>Bewertung</h3><div id="fbErfuellung"></div></div>
     <div class="fb-section"><h3>Niveaueinschätzung</h3><p id="fbAufbau"></p></div>
-    <div class="fb-section"><h3>Sprachliche Analyse</h3><div id="fbSprache"></div></div>
+    <div class="fb-section"><h3>Análise linguística</h3><div id="fbSprache"></div></div>
     <div class="fb-section"><h3>Feedback</h3><ul class="korrekturen" id="korrekturenList"></ul></div>
     <div class="tip-box" id="fbTip"></div>
     <button class="ghost" id="btnMusterloesung" style="margin-top:16px;">📄 Musterlösung anzeigen</button>
@@ -138,7 +138,7 @@ textarea.big.small{min-height:220px;}
   </div>
 
   <div class="nav-row" id="navNovaCorrekturWrap" style="display:none;">
-    <button class="ghost" id="btnNovaKorrektur">← Neue Korrektur</button>
+    <button class="ghost" id="btnNovaKorrektur">← Nova correção</button>
     <span></span>
   </div>
 
@@ -787,7 +787,7 @@ Der Text soll ein realistisches, gut geschriebenes Beispiel für dieses Niveau s
     const texto = await callGemini(prompt, 1500);
     $('musterloesungResult').innerHTML = `<div class="fokus-result" style="margin-top:12px;">${escapeHtml(texto)}</div>`;
   } catch(e) {
-    $('musterloesungResult').innerHTML = `<div class="fokus-result" style="margin-top:12px;">Fehler beim Erstellen. Bitte nochmal versuchen.</div>`;
+    $('musterloesungResult').innerHTML = `<div class="fokus-result" style="margin-top:12px;">Não foi possível criar a correção. Tente novamente.</div>`;
   }
   btn.disabled = false;
   btn.textContent = '📄 Musterlösung anzeigen';
