@@ -94,12 +94,24 @@ const SUPABASE_URL = window.SCHREIBTRAINER_CONFIG?.SUPABASE_URL || "";
 const SUPABASE_KEY = window.SCHREIBTRAINER_CONFIG?.SUPABASE_ANON_KEY || "";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+async function redirecionarAposLogin(session) {
+  if (!session) return;
+  const { data: perfil } = await supabase.from('perfis').select('role').eq('user_id', session.user.id).maybeSingle();
+  const role = perfil?.role;
+  if (role === 'teacher' || role === 'admin') {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    location.href = (aal?.nextLevel === 'aal2' || aal?.currentLevel === 'aal2') ? '/mfa' : '/mfa';
+    return;
+  }
+  location.href = '/trainer-hub';
+}
+
 supabase.auth.onAuthStateChange((event, session) => {
-  if (session) location.href = '/trainer-hub';
+  if (session && event === 'SIGNED_IN') redirecionarAposLogin(session);
 });
 
 const { data: { session } } = await supabase.auth.getSession();
-if (session) location.href = '/trainer-hub';
+if (session) redirecionarAposLogin(session);
 
 let modoRegistrar = false;
 let modoEsqueci = false;
@@ -211,7 +223,7 @@ $('btnSubmit').addEventListener('click', async () => {
     if (modoRegistrar && !result.data.session) {
       showMsg('Conta criada. Agora você pode entrar.', 'ok');
     } else {
-      location.href = '/trainer-hub';
+      await redirecionarAposLogin(result.data.session);
     }
   } catch(e) {
     showMsg(e.message || 'Fehler beim Entrar.');
