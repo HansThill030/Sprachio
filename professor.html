@@ -131,6 +131,16 @@ let ehProfessor = false;
 let turmas = [];
 let turmaAtual = null;
 
+async function garantirMFA() {
+  const { data: aal, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (error) throw error;
+  if (aal?.currentLevel !== 'aal2') {
+    location.replace('/mfa');
+    return false;
+  }
+  return true;
+}
+
 async function init(){
   try {
     const res = await sbFetch(`perfis?user_id=eq.${session.user.id}&select=role`);
