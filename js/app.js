@@ -850,7 +850,7 @@ if ($('textInput')) $('textInput').addEventListener('input', () => {
   clearTimeout(draftSaveTimer);
   draftSaveTimer = setTimeout(salvarRascunho, 800);
 });
-if ($('btnBackToAufgabe')) $('btnBackToAufgabe').addEventListener('click', () => { pararSalvamentoNuvemPeriodico(); goToPage('aufgabe'); });
+if ($('btnBackToAtividade')) $('btnBackToAtividade').addEventListener('click', () => { pararSalvamentoNuvemPeriodico(); goToPage('aufgabe'); });
 async function enviarEntregaTurma(text) {
   if (!_session?.user?.id || !state.aufgabaObj?.aufgabe_id || !state.aufgabaObj?.turma_id) {
     throw new Error('A atividade da turma não pôde ser identificada.');
@@ -1601,7 +1601,7 @@ function renderAufgabeInline(){
   $('btnToggleAufgabe').textContent = aufgabeVisivel ? 'Ausblenden' : 'Einblenden';
 }
 
-document.getElementById('btnToggleAufgabe')?.addEventListener('click', () => {
+document.getElementById('btnToggleAtividade')?.addEventListener('click', () => {
   aufgabeVisivel = !aufgabeVisivel;
   $('aufgabeInlineBody').classList.toggle('collapsed', !aufgabeVisivel);
   $('btnToggleAufgabe').textContent = aufgabeVisivel ? 'Ausblenden' : 'Einblenden';
