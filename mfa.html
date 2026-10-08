@@ -1,116 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<script src="js/consent.js"></script>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
-<script src="js/theme.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verificação em duas etapas — Sprachio</title>
+<title>Verificação por e-mail — Sprachio</title>
 <link rel="icon" href="assets/mark.png">
-<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/styles.css">
-<style>
-.mfa-wrap{min-height:70vh;display:grid;place-items:center;padding:32px 18px}
-.mfa-card{width:min(460px,100%);background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.12)}
-.mfa-card h1{margin:0 0 8px;font-family:"Space Grotesk",sans-serif;font-size:1.6rem}
-.mfa-card p{color:var(--ink-soft);line-height:1.55;margin:0 0 22px}
-.mfa-qr{display:grid;place-items:center;background:#fff;border-radius:14px;padding:16px;margin:18px 0}
-.mfa-qr img{width:min(240px,100%);height:auto;image-rendering:auto}
-.mfa-secret{font-family:"IBM Plex Mono",monospace;background:var(--bg);border:1px solid var(--line);padding:10px;border-radius:8px;word-break:break-all;font-size:.78rem;color:var(--ink)}
-.mfa-code{font-size:1.35rem!important;letter-spacing:.28em;text-align:center;font-family:"IBM Plex Mono",monospace}
-.mfa-btn{width:100%;margin-top:12px}
-.mfa-msg{min-height:24px;margin-top:14px;font-size:.86rem;color:var(--err)}
-.mfa-msg.ok{color:var(--ok)}
-.mfa-muted{font-size:.78rem!important;color:var(--ink-faint)!important}
-</style>
 </head>
 <body>
-<div class="wrap">
-  <div class="masthead">
-    <a class="brand" href="/"><img src="assets/mark.png" alt="Sprachio" width="53" height="60"><span><span class="name">SPRACHIO</span><br><span class="sub">Aprenda alemão. Evolua sempre.</span></span></a>
+<div class="wrap" role="main" style="max-width:520px;margin:auto;padding:48px 18px;">
+  <div class="auth-card" style="margin-top:10vh;text-align:center;">
+    <img src="assets/mark.png" alt="Sprachio" width="53" height="60">
+    <h1 style="margin-top:18px;">Verificação por e-mail</h1>
+    <p>O acesso de professores e administradores é protegido por um código enviado para o seu e-mail.</p>
+    <p><strong>O Sprachio não usa aplicativo autenticador.</strong></p>
+    <a class="auth-btn" href="/email-verification" style="display:block;text-decoration:none;margin-top:20px;">Continuar</a>
   </div>
 </div>
-<main class="mfa-wrap">
-  <section class="mfa-card">
-    <div id="loading"><div class="loading-big"><div class="spin"></div>Verificando sua conta…</div></div>
-    <div id="setup" style="display:none">
-      <h1>Proteja sua conta</h1>
-      <p>Como você é professor(a) ou administrador(a), a verificação em duas etapas é obrigatória no Sprachio.</p>
-      <p>1. Abra Google Authenticator, Microsoft Authenticator ou outro app compatível e escaneie o QR Code.</p>
-      <div class="mfa-qr"><img id="qr" alt="QR Code para configurar a autenticação"></div>
-      <p class="mfa-muted">Se não conseguir escanear, use esta chave:</p>
-      <div class="mfa-secret" id="secret"></div>
-      <p style="margin-top:20px">2. Digite o código de 6 dígitos mostrado no aplicativo.</p>
-      <input id="codeSetup" class="mfa-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000">
-      <button id="verifySetup" class="primary mfa-btn">Ativar verificação</button>
-    </div>
-    <div id="challenge" style="display:none">
-      <h1>Verificação em duas etapas</h1>
-      <p>Digite o código de 6 dígitos do seu aplicativo autenticador para continuar.</p>
-      <input id="codeChallenge" class="mfa-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000">
-      <button id="verifyChallenge" class="primary mfa-btn">Verificar e continuar</button>
-    </div>
-    <div id="msg" class="mfa-msg"></div>
-    <button id="logout" class="ghost mfa-btn">Sair</button>
-  </section>
-</main>
-<script src="js/config.js"></script>
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-const supabase=createClient(window.SCHREIBTRAINER_CONFIG.SUPABASE_URL,window.SCHREIBTRAINER_CONFIG.SUPABASE_ANON_KEY);
-const $=id=>document.getElementById(id);
-const msg=(text,ok=false)=>{ $('msg').textContent=text; $('msg').className='mfa-msg'+(ok?' ok':''); };
-const show=id=>{ $('loading').style.display='none'; $('setup').style.display=id==='setup'?'block':'none'; $('challenge').style.display=id==='challenge'?'block':'none'; };
-$('logout').addEventListener('click',async()=>{await supabase.auth.signOut();location.href='/login';});
-
-async function init(){
-  const {data:{session}}=await supabase.auth.getSession();
-  if(!session){location.href='/login';return;}
-  const {data:perfil}=await supabase.from('perfis').select('role').eq('user_id',session.user.id).maybeSingle();
-  if(!['teacher','admin'].includes(perfil?.role)){location.href='/trainer-hub';return;}
-  const {data:aal,error:aalError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  if(aalError) throw aalError;
-  if(aal?.currentLevel==='aal2'){location.href=perfil.role==='admin'?'/professor':'/professor';return;}
-  const {data:factors,error}=await supabase.auth.mfa.listFactors();
-  if(error) throw error;
-  const verified=(factors?.totp||[]).filter(f=>f.status==='verified');
-  if(verified.length){
-    const factor=verified[0];
-    const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:factor.id});
-    if(challengeError) throw challengeError;
-    window.__factorId=factor.id; window.__challengeId=challenge.id;
-    show('challenge');
-    $('codeChallenge').focus();
-  }else{
-    const {data:factor,error:enrollError}=await supabase.auth.mfa.enroll({factorType:'totp',friendlyName:'Sprachio'});
-    if(enrollError) throw enrollError;
-    window.__factorId=factor.id; window.__secret=factor.totp.secret;
-    $('qr').src=factor.totp.qr_code; $('secret').textContent=factor.totp.secret;
-    show('setup'); $('codeSetup').focus();
-  }
-}
-async function verify(factorId,challengeId,code,redirect){
-  if(!/^\d{6}$/.test(code)){msg('Digite um código de 6 dígitos.');return;}
-  $('verifySetup').disabled=true;$('verifyChallenge').disabled=true;msg('Verificando…');
-  try{
-    const {error}=await supabase.auth.mfa.verify({factorId,challengeId,code});
-    if(error) throw error;
-    await supabase.auth.refreshSession();
-    location.href=redirect;
-  }catch(e){msg(e.message||'Código inválido. Tente novamente.');}
-  finally{$('verifySetup').disabled=false;$('verifyChallenge').disabled=false;}
-}
-$('verifySetup').addEventListener('click',async()=>{
-  if(!window.__factorId)return;
-  const {data:challenge,error}=await supabase.auth.mfa.challenge({factorId:window.__factorId});
-  if(error){msg(error.message);return;}
-  await verify(window.__factorId,challenge.id,$('codeSetup').value.trim(),'/professor');
-});
-$('verifyChallenge').addEventListener('click',()=>verify(window.__factorId,window.__challengeId,$('codeChallenge').value.trim(),'/professor'));
-$('codeSetup').addEventListener('keydown',e=>{if(e.key==='Enter')$('verifySetup').click()});
-$('codeChallenge').addEventListener('keydown',e=>{if(e.key==='Enter')$('verifyChallenge').click()});
-init().catch(e=>{console.error(e);msg('Não foi possível iniciar a verificação. Saia e entre novamente.');show('challenge');});
-</script>
 </body>
 </html>
