@@ -547,8 +547,30 @@ if (SUPABASE_URL) {
       msgEl.textContent = 'Não foi possível entrar na turma. Verifique o código e tente novamente.';
     }
   });
-  carregarAufgabenTurmas();
+  // Inicializa os dados do hub. O nome correto da função é carregarAtividadenTurmas.
+  carregarAtividadenTurmas();
   carregarProgressoERecomendacoes();
+
+  function abrirSecao(id){
+    const section = document.getElementById(id);
+    if (!section) return;
+    section.style.display = 'block';
+    section.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  document.querySelectorAll('a[href="#classAssignmentsSection"]').forEach(link => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      abrirSecao('classAssignmentsSection');
+    });
+  });
+
+  document.querySelectorAll('a[href="#personalProgressSection"]').forEach(link => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      abrirSecao('personalProgressSection');
+    });
+  });
 }
 </script>
 <div class="install-banner" id="installBanner" role="status" aria-live="polite">
