@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sprachio-v4';
+const CACHE_NAME = 'sprachio-v5';
 const SHELL_FILES = [
   '/',
   '/trainer-hub',
