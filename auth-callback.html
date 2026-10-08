@@ -37,7 +37,7 @@ async function continuar(session) {
   if (!session) return;
   const { data: perfil } = await supabase.from('perfis').select('role').eq('user_id', session.user.id).maybeSingle();
   if (perfil?.role === 'teacher' || perfil?.role === 'admin') {
-    location.href = '/mfa';
+    location.href = '/email-verification';
   } else {
     location.href = '/trainer#/config';
   }
