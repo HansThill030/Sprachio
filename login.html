@@ -99,8 +99,7 @@ async function redirecionarAposLogin(session) {
   const { data: perfil } = await supabase.from('perfis').select('role').eq('user_id', session.user.id).maybeSingle();
   const role = perfil?.role;
   if (role === 'teacher' || role === 'admin') {
-    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    location.href = (aal?.nextLevel === 'aal2' || aal?.currentLevel === 'aal2') ? '/mfa' : '/mfa';
+    location.href = '/email-verification';
     return;
   }
   location.href = '/trainer-hub';
